@@ -261,7 +261,7 @@ const CollegeFinder = () => {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by college name (e.g. Rajalakshmi, SVCE, Sairam, PSG)..."
+              placeholder="Search college..."
               className="w-full bg-slate-950 border border-slate-700/80 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
             />
           </div>
@@ -284,7 +284,7 @@ const CollegeFinder = () => {
               onChange={(e) => setSelectedStream(e.target.value)}
               className="w-full bg-slate-950 border border-slate-700/80 rounded-2xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-medium"
             >
-              <option value="All">All Streams (Engineering, Poly, Arts)</option>
+              <option value="All">All Streams</option>
               <option value="Engineering">Engineering (B.E / B.Tech)</option>
               <option value="Commerce/Arts">Commerce & Arts (B.Com, BBA)</option>
               <option value="Polytechnic">Polytechnic Diploma</option>
@@ -390,10 +390,9 @@ const CollegeFinder = () => {
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center p-4 text-center select-none">
-                      <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-xl mb-1">
+                      <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-xl">
                         <span className="text-2xl font-black text-amber-300 tracking-widest">{initials}</span>
                       </div>
-                      <span className="text-[11px] font-bold text-slate-300/90 max-w-[240px] truncate">{col.name}</span>
                     </div>
                   )}
 

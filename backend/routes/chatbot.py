@@ -32,7 +32,6 @@ def normalize_text(text: str) -> str:
 NORMALIZED_GREETINGS = [normalize_text(g) for g in GREETING_WORDS]
 
 def is_greeting(msg: str) -> bool:
-    # Apply only when message is 1 to 3 words
     words_orig = re.sub(r'[^\w\s]', '', msg).strip().split()
     if not (1 <= len(words_orig) <= 3):
         return False
@@ -151,41 +150,30 @@ def chat_with_ai(req: ChatRequest):
     msg_lower = msg.lower()
     lang = (req.language or "en").lower()
 
-    # Context resolution from previous history
     prev_context = ""
+    prev_cutoff_score = None
+
     if req.history:
-        for past_msg in reversed(req.history[-4:]):
-            text = past_msg.get("text", "").lower()
-            if "scholarship" in text or "fee" in text:
-                prev_context = "scholarship"
-                break
-            elif "cutoff" in text or "tnea" in text or "maths" in text or "physics" in text:
-                prev_context = "cutoff"
-                break
-            elif "job" in text or "career" in text:
-                prev_context = "job"
-                break
-            elif "nsqf" in text or "skill" in text:
-                prev_context = "nsqf"
-                break
+        for past_msg in reversed(req.history[-5:]):
+            text = past_msg.get("text", "")
+            text_lower = text.lower()
 
-    # Resolve follow-up words ("that", "this", "for bc", "for sc", "more", "what about")
-    if prev_context and (
-        contains_whole_word(msg_lower, "that") or 
-        contains_whole_word(msg_lower, "this") or 
-        "bc" in msg_lower or "sc" in msg_lower or "st" in msg_lower or "oc" in msg_lower or 
-        "more" in msg_lower or "what about" in msg_lower
-    ):
-        if prev_context == "scholarship" and "scholarship" not in msg_lower:
-            msg_lower += " scholarship"
-        elif prev_context == "cutoff" and "cutoff" not in msg_lower:
-            msg_lower += " cutoff"
-        elif prev_context == "job" and "job" not in msg_lower:
-            msg_lower += " job"
-        elif prev_context == "nsqf" and "nsqf" not in msg_lower:
-            msg_lower += " nsqf"
+            if not prev_cutoff_score:
+                m_score = re.search(r'Score:\s*(\d{2,3}(?:\.\d+)?)', text) or re.search(r'cutoff\s*(?:is|score)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)', text, re.IGNORECASE)
+                if m_score:
+                    prev_cutoff_score = m_score.group(1)
 
-    # Step 2: Check for Marks & Calculate TNEA Cutoff
+            if not prev_context:
+                if "scholarship" in text_lower or "fee" in text_lower:
+                    prev_context = "scholarship"
+                elif "cutoff" in text_lower or "tnea" in text_lower or "maths" in text_lower or "physics" in text_lower:
+                    prev_context = "cutoff"
+                elif "job" in text_lower or "career" in text_lower:
+                    prev_context = "job"
+                elif "nsqf" in text_lower or "skill" in text_lower:
+                    prev_context = "nsqf"
+
+    # Step 1: Check for Marks & Calculate TNEA Cutoff directly
     cutoff_result = extract_and_calculate_cutoff(msg)
     if cutoff_result["calculated"]:
         m = cutoff_result["maths"]
@@ -212,6 +200,26 @@ def chat_with_ai(req: ChatRequest):
                 "Check Colleges & Cutoffs Page",
                 "View Scholarships",
                 "See AI Industry Trends"
+            ]
+        }
+
+    # Step 2: Specialized BC / Community Cutoff Follow-up Answer
+    if contains_whole_word(msg_lower, "bc") or "backward class" in msg_lower or (prev_context == "cutoff" and ("category" in msg_lower or "community" in msg_lower)):
+        score_text = f"Your calculated cutoff score is {prev_cutoff_score} / 200.\n\n" if prev_cutoff_score else ""
+        response_text = (
+            f"🏛️ Community Cutoffs for BC (Backward Class) Students:\n\n"
+            f"{score_text}"
+            f"• Colleges in Tamil Nadu publish separate TNEA cutoff benchmarks for each community category (OC, BC, BCM, MBC, SC, ST).\n"
+            f"• The BC cutoff benchmark is usually lower than the OC (Open Competition) cutoff.\n"
+            f"• On each college card in the 'Colleges & Cutoffs' page, compare your cutoff score directly with the 'BC' cutoff number shown (e.g., BC: 158 | OC: 168).\n\n"
+            f"*(Note: TNEA cutoffs are approximate, change every year based on applicant merit, and vary by community category).*"
+        )
+        return {
+            "reply": response_text,
+            "suggested_actions": [
+                "Check Colleges & Cutoffs Page",
+                "Options after 12th",
+                "View Scholarships"
             ]
         }
 
@@ -307,7 +315,7 @@ def chat_with_ai(req: ChatRequest):
             "and escalating to NSQF Level 6 (Advanced AI/ML & PyTorch). Average starting salary ranges from ₹4.5L to ₹7.5L PA."
         )
     else:
-        # Honest Fallback Message (Never repeats greeting)
+        # Honest Fallback Message
         response_text = (
             "I'm not sure about that specific query yet. I can help you with:\n\n"
             "• 🧮 TNEA Cutoff Calculations (e.g., '99 in Maths, 69 in Physics, 81 in Chemistry')\n"

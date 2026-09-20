@@ -13,6 +13,11 @@ venv/
 .venv/
 env/
 
+# Environment variables
+.env
+*.env
+.env.*
+
 # OS / IDE
 .DS_Store
 Thumbs.db
