@@ -67,6 +67,9 @@ const CollegeFinder = () => {
   const [selectedStream, setSelectedStream] = useState('All');
   const [loading, setLoading] = useState(false);
 
+  const [isWakingUp, setIsWakingUp] = useState(false);
+  const [isError, setIsError] = useState(false);
+
   // TNEA Cutoff Calculator & Prediction State
   const [mathsMarks, setMathsMarks] = useState(65);
   const [physicsMarks, setPhysicsMarks] = useState(69);
@@ -83,6 +86,13 @@ const CollegeFinder = () => {
 
   const fetchColleges = async () => {
     setLoading(true);
+    setIsWakingUp(false);
+    setIsError(false);
+
+    const wakeTimer = setTimeout(() => {
+      setIsWakingUp(true);
+    }, 5000);
+
     const cleanDistrict = selectedDistrict.includes("All Districts") ? undefined : selectedDistrict;
     try {
       const res = await axios.get('/api/colleges', {
@@ -96,8 +106,11 @@ const CollegeFinder = () => {
       setColleges(res.data.colleges);
     } catch (err) {
       console.error('Error fetching colleges:', err);
+      setIsError(true);
     } finally {
+      clearTimeout(wakeTimer);
       setLoading(false);
+      setIsWakingUp(false);
     }
   };
 
@@ -143,19 +156,19 @@ const CollegeFinder = () => {
 
         {/* Interactive TNEA Cutoff Calculator Widget */}
         {showCalculator && (
-          <div className="mt-6 bg-slate-950/90 border border-amber-500/40 rounded-2xl p-5 animate-fade-in shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="mt-6 bg-slate-950/90 border border-amber-500/40 rounded-2xl p-4 sm:p-5 animate-fade-in shadow-2xl space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <h4 className="text-sm font-bold text-amber-400 flex items-center space-x-2">
-                <Calculator className="w-4 h-4" />
+                <Calculator className="w-4 h-4 shrink-0" />
                 <span>TNEA Engineering Cutoff Calculator & Admission Predictor</span>
               </h4>
 
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-semibold text-slate-300">Quota:</span>
+              <div className="flex items-center space-x-2 w-full sm:w-auto">
+                <span className="text-xs font-semibold text-slate-300 shrink-0">Quota:</span>
                 <select
                   value={selectedCommunity}
                   onChange={(e) => setSelectedCommunity(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-bold focus:outline-none"
+                  className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-amber-300 font-bold focus:outline-none w-full sm:w-auto"
                 >
                   <option value="BC">BC (Backward Class)</option>
                   <option value="OC">OC (Open Competition)</option>
@@ -297,10 +310,28 @@ const CollegeFinder = () => {
       )}
 
       {/* College Cards Grid */}
-      {loading ? (
-        <div className="py-16 text-center text-slate-400 text-sm">
+      {isError ? (
+        <div className="bg-rose-950/80 border border-rose-800 rounded-3xl p-8 text-center text-rose-200 space-y-3">
+          <AlertCircle className="w-8 h-8 text-rose-400 mx-auto" />
+          <h4 className="text-base font-bold text-white">Couldn't load colleges, try again</h4>
+          <p className="text-xs text-rose-300">The free backend server may be waking up from sleep mode.</p>
+          <button
+            onClick={fetchColleges}
+            className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-lg"
+          >
+            🔄 Retry Fetching Colleges
+          </button>
+        </div>
+      ) : loading ? (
+        <div className="py-16 text-center text-slate-400 text-sm space-y-3">
           <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          Fetching Colleges across Tamil Nadu...
+          <p className="font-bold text-slate-200">Fetching Colleges across Tamil Nadu...</p>
+          {isWakingUp && (
+            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-amber-950/80 text-amber-300 border border-amber-800/80 text-xs font-bold animate-pulse">
+              <AlertCircle className="w-4 h-4 text-amber-400" />
+              <span>Server is waking up, please wait...</span>
+            </div>
+          )}
         </div>
       ) : displayedColleges.length === 0 ? (
         <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 text-center text-slate-400 space-y-2">

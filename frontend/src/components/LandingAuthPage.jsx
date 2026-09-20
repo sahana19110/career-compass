@@ -78,26 +78,26 @@ const LandingAuthPage = ({ onLoginSuccess, currentLang, setCurrentLang }) => {
               </div>
             </div>
             <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent">
+              <div className="flex items-center space-x-1">
+                <span className="font-extrabold text-sm sm:text-lg tracking-tight bg-gradient-to-r from-white via-cyan-100 to-cyan-400 bg-clip-text text-transparent whitespace-nowrap">
                   {t.brand_title}
                 </span>
-                <span className="px-1.5 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/80 text-[9px] sm:text-[10px] font-bold">
+                <span className="px-1 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/80 text-[8px] sm:text-[10px] font-bold">
                   v2.0
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center space-x-1.5 sm:space-x-4">
             
             {/* Language Selector Dropdown */}
-            <div className="flex items-center space-x-1 bg-slate-900/90 border border-slate-800 px-2.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold hover:border-slate-700 transition-all">
-              <Globe className="w-3 h-3 text-cyan-400" />
+            <div className="flex items-center space-x-1 bg-slate-900/90 border border-slate-800 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold hover:border-slate-700 transition-all">
+              <Globe className="w-3 h-3 text-cyan-400 shrink-0" />
               <select
                 value={currentLang}
                 onChange={(e) => setCurrentLang(e.target.value)}
-                className="bg-transparent text-slate-200 focus:outline-none cursor-pointer"
+                className="bg-transparent text-slate-200 focus:outline-none cursor-pointer text-[10px] sm:text-xs"
               >
                 <option value="en" className="bg-slate-900 text-white">English</option>
                 <option value="ta" className="bg-slate-900 text-white">தமிழ்</option>
@@ -109,9 +109,9 @@ const LandingAuthPage = ({ onLoginSuccess, currentLang, setCurrentLang }) => {
 
             <button
               onClick={handleDemoLogin}
-              className="flex items-center space-x-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[11px] sm:text-xs font-extrabold shadow-lg shadow-cyan-500/20 transition-all"
+              className="flex items-center space-x-1 px-2.5 sm:px-4 py-1 sm:py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-[10px] sm:text-xs font-extrabold shadow-lg shadow-cyan-500/20 transition-all shrink-0"
             >
-              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current shrink-0" />
               <span>Explore</span>
             </button>
 

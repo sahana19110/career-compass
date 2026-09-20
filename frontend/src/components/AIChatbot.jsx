@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bot, Send, User, Sparkles, Globe, Mic, Volume2 } from 'lucide-react';
 import axios from 'axios';
 
-const AIChatbot = () => {
+const AIChatbot = ({ user }) => {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
@@ -17,8 +17,8 @@ const AIChatbot = () => {
   const quickPrompts = [
     "What options do I have after 10th Grade?",
     "What are top career options after 12th PCM?",
-    "How is TNEA engineering cutoff calculated?",
-    "What NSQF level is Full Stack & AI?",
+    "99 in Maths, 69 in Physics, 81 in Chemistry",
+    "Which course is best for me?",
     "Show top scholarships in Tamil Nadu"
   ];
 
@@ -28,14 +28,26 @@ const AIChatbot = () => {
 
     // Add user message
     const userMsg = { sender: 'user', text: query };
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     if (!textToSend) setInput('');
     setIsTyping(true);
 
     try {
+      // Send last 5 messages for context memory
+      const historyPayload = updatedMessages.slice(-5).map((m) => ({
+        sender: m.sender,
+        text: m.text
+      }));
+
       const res = await axios.post('/api/chat', {
         message: query,
-        language: language
+        language: language,
+        user_name: user?.name || 'Sahana Balaji',
+        education: user?.role || 'Computer Science Student',
+        target_career: 'AI & Full-Stack Engineering',
+        skills: 'Python, React, Web Development',
+        history: historyPayload
       });
 
       const botMsg = { sender: 'bot', text: res.data.reply };
@@ -136,12 +148,12 @@ const AIChatbot = () => {
       </div>
 
       {/* Quick Prompts Bar */}
-      <div className="px-4 py-2 bg-slate-900/90 border-t border-slate-800 overflow-x-auto flex space-x-2 no-scrollbar">
+      <div className="px-4 py-2.5 bg-slate-900/90 border-t border-slate-800 flex flex-wrap gap-2 shrink-0">
         {quickPrompts.map((prompt, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(prompt)}
-            className="text-[11px] px-3 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700/80 rounded-full whitespace-nowrap transition-colors"
+            className="text-[11px] px-3 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700/80 rounded-full transition-colors font-medium text-left"
           >
             {prompt}
           </button>

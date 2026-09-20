@@ -29,7 +29,7 @@ const MarketTrends = () => {
         {
           id: 2,
           domain: "Full Stack & Cloud",
-          demand_score: 92,
+          demand_score: 82,
           growth_rate: "+28% YoY",
           top_skills: ["React.js", "FastAPI", "PostgreSQL", "Docker", "AWS"],
           avg_entry_salary: "₹3.8 - ₹6.5 LPA",
@@ -39,7 +39,7 @@ const MarketTrends = () => {
         {
           id: 3,
           domain: "Cyber Security",
-          demand_score: 88,
+          demand_score: 89,
           growth_rate: "+30% YoY",
           top_skills: ["Network Security", "Ethical Hacking", "SIEM Tools", "Linux Admin"],
           avg_entry_salary: "₹4.0 - ₹6.8 LPA",
@@ -49,7 +49,7 @@ const MarketTrends = () => {
         {
           id: 4,
           domain: "EV & Green Tech",
-          demand_score: 84,
+          demand_score: 74,
           growth_rate: "+42% YoY",
           top_skills: ["Battery Management", "Embedded Systems", "MATLAB", "CAN Protocol"],
           avg_entry_salary: "₹3.5 - ₹5.5 LPA",
@@ -83,8 +83,8 @@ const MarketTrends = () => {
             <TrendingUp className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Real-Time Labor Market Intelligence</h2>
-            <p className="text-xs text-slate-400">Industry hiring demand, top skill requirements, and entry/mid-level salary insights</p>
+            <h2 className="text-xl font-bold text-white">Industry Demand Estimates 2026</h2>
+            <p className="text-xs text-slate-400">Projected hiring demand, top skill requirements, and entry/mid-level salary insights</p>
           </div>
         </div>
       </div>
@@ -93,25 +93,32 @@ const MarketTrends = () => {
       <div className="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 md:p-8">
         <h3 className="text-base font-bold text-white mb-6 flex items-center space-x-2">
           <BarChart3 className="w-5 h-5 text-cyan-400" />
-          <span>Industry Skill Demand Score Index (out of 100)</span>
+          <span>Industry Skill Demand Index (out of 100) — 2026 Projections</span>
         </h3>
 
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={12} domain={[0, 100]} tickLine={false} />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }}
-              />
-              <Bar dataKey="score" radius={[8, 8, 0, 0]}>
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {loading ? (
+          <div className="h-64 flex flex-col items-center justify-center space-y-3 text-slate-400">
+            <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-xs font-bold">Loading Demand Index Data...</span>
+          </div>
+        ) : (
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={12} domain={[0, 100]} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }}
+                />
+                <Bar dataKey="score" radius={[8, 8, 0, 0]} label={{ position: 'top', fill: '#38bdf8', fontSize: 12, fontWeight: 'bold' }}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* Detailed Domain Cards */}

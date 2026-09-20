@@ -24,7 +24,7 @@ const ScholarshipFinder = () => {
           offered_by: "Ministry of Education / AICTE",
           eligibility: "Female students admitted to 1st year Degree/Diploma program with family income < ₹8 Lakh/annum.",
           amount_per_year: "₹50,000 per annum",
-          deadline: "31st October",
+          deadline: "31st Oct 2026",
           application_url: "https://scholarships.gov.in"
         },
         {
@@ -33,7 +33,7 @@ const ScholarshipFinder = () => {
           offered_by: "Government of Tamil Nadu",
           eligibility: "Students pursuing professional courses who are the first in their family to attend college.",
           amount_per_year: "Tuition fee waiver (Up to ₹20,000 - ₹50,000/year)",
-          deadline: "During Single Window Counseling",
+          deadline: "Check portal for 2026 dates",
           application_url: "https://tneaonline.org"
         },
         {
@@ -42,7 +42,7 @@ const ScholarshipFinder = () => {
           offered_by: "Ministry of Social Justice & Empowerment",
           eligibility: "SC/ST students pursuing Higher Secondary, Diploma, Degree, or PG programs.",
           amount_per_year: "100% Maintenance allowance + Full tuition fee coverage",
-          deadline: "30th November",
+          deadline: "30th Nov 2026",
           application_url: "https://scholarships.gov.in"
         },
         {
@@ -51,7 +51,7 @@ const ScholarshipFinder = () => {
           offered_by: "Department of Higher Education",
           eligibility: "Top 20th percentile students of Class 12 board exams with annual family income < ₹4.5 Lakh.",
           amount_per_year: "₹12,000 per annum for Graduation",
-          deadline: "31st December",
+          deadline: "31st Dec 2026",
           application_url: "https://scholarships.gov.in"
         }
       ]);

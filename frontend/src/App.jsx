@@ -74,32 +74,28 @@ function App() {
       {/* Main Content Area */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-8 overflow-y-auto">
         
-        {/* Top Welcome Header */}
-        <div className="relative bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-2xl">
+        {/* Top Welcome Header - Compact */}
+        <div className="relative bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 overflow-hidden shadow-xl">
           <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div>
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/80 text-xs font-bold mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/80 text-[11px] font-bold mb-1">
+                <Sparkles className="w-3 h-3" />
                 <span>ASCENTIA AI Engine Active</span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 {t.welcome}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">{user.name}</span>
               </h1>
-
-              <p className="text-xs sm:text-sm text-slate-300 mt-1 italic font-semibold">
-                {t.quote}
-              </p>
             </div>
 
-            <div className="flex items-center space-x-2 bg-slate-950/90 border border-slate-800 px-4 py-2.5 rounded-2xl text-xs font-bold shadow-lg">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div className="flex items-center space-x-2 bg-slate-950/90 border border-slate-800 px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span className="text-slate-200">
                 {recommendation
                   ? `🎯 Target: ${recommendation.learner_summary.target_career}`
-                  : `🎓 Learner Profile: ${user.role || 'Computer Science Student'}`}
+                  : `🎓 Profile: ${user.role || 'Computer Science Student'}`}
               </span>
             </div>
           </div>
@@ -126,7 +122,7 @@ function App() {
 
         {activeTab === 'scholarships' && <ScholarshipFinder />}
 
-        {activeTab === 'chatbot' && <AIChatbot />}
+        {activeTab === 'chatbot' && <AIChatbot user={user} />}
 
       </main>
 
