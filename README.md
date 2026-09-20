@@ -2,19 +2,15 @@
 
 > **“From Aspiration to Achievement: Your Smart Skilling Navigator”**
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_App-career--compass--rho--tawny.vercel.app-00F0FF?style=for-the-badge&logo=vercel)](https://career-compass-rho-tawny.vercel.app)
-[![Backend API](https://img.shields.io/badge/⚙️_Backend_API-Render_Live-46E3B7?style=for-the-badge&logo=render)](https://career-compass-1mil.onrender.com)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-
 ASCENTIA AI is an intelligent full-stack career navigation and admission allocation platform designed to empower students across Tamil Nadu and nationwide. It dynamically maps academic qualifications to **NSQF Levels 1–10**, calculates **TNEA engineering cutoffs**, indexes **60+ top colleges across all 38 Tamil Nadu districts**, and bridges skill gaps through interactive technical micro-credentials.
 
 ---
 
-## 🌐 Live Demo Links
+## 🌐 Live Website & Demo
 
 - 🎨 **Live Web Application**: [https://career-compass-rho-tawny.vercel.app](https://career-compass-rho-tawny.vercel.app)
-- ⚙️ **Live FastAPI Backend API**: [https://career-compass-1mil.onrender.com](https://career-compass-1mil.onrender.com)
-- 📖 **Interactive Swagger API Documentation**: [https://career-compass-1mil.onrender.com/docs](https://career-compass-1mil.onrender.com/docs)
+- ⚙️ **Backend API Status**: [https://career-compass-1mil.onrender.com](https://career-compass-1mil.onrender.com)
+- 📖 **API Documentation**: [https://career-compass-1mil.onrender.com/docs](https://career-compass-1mil.onrender.com/docs)
 
 ---
 
