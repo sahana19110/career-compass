@@ -58,7 +58,9 @@ def init_db():
         courses_offered TEXT,
         cutoff_marks TEXT,
         fees_per_year TEXT,
-        website TEXT
+        website TEXT,
+        image_url TEXT,
+        photo_attribution TEXT
     )
     """)
 

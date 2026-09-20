@@ -59,6 +59,13 @@ const getCollegeRating = (col, idx) => {
   return baseRatings[idx % baseRatings.length];
 };
 
+const getCollegeInitials = (name) => {
+  if (!name) return 'TN';
+  const words = name.replace(/\([^)]*\)/g, '').split(/\s+/).filter(Boolean);
+  if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
+  return words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+};
+
 const CollegeFinder = () => {
   const [colleges, setColleges] = useState([]);
   const [search, setSearch] = useState('');
@@ -414,6 +421,12 @@ const CollegeFinder = () => {
                     <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                     <span>{getCollegeRating(col, idx)}</span>
                   </div>
+
+                  {col.photo_attribution && (
+                    <div className="absolute bottom-1 right-2 text-[8px] text-slate-300/80 bg-slate-950/75 px-1.5 py-0.5 rounded backdrop-blur-xs max-w-[160px] truncate pointer-events-none">
+                      📷 {col.photo_attribution}
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-6 flex-1 flex flex-col justify-between">
