@@ -72,7 +72,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           className="w-full py-2.5 px-4 mb-6 rounded-xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
         >
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>⚡ Instant 1-Click Demo Login</span>
+          <span>Instant 1-Click Demo Login</span>
         </button>
 
         <div className="relative flex py-1 items-center mb-6">

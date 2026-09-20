@@ -48,8 +48,16 @@ const COLLEGE_IMAGES = [
   "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=600&q=80"
+  "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=600&q=80"
 ];
+
+const getCollegeRating = (col, idx) => {
+  if (col.rating) return col.rating;
+  const baseRatings = [4.9, 4.8, 4.7, 4.6, 4.9, 4.5, 4.8, 4.7, 4.6, 4.4];
+  return baseRatings[idx % baseRatings.length];
+};
 
 const CollegeFinder = () => {
   const [colleges, setColleges] = useState([]);
@@ -309,6 +317,10 @@ const CollegeFinder = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {displayedColleges.map((col, idx) => {
+            const isPolytechnic = col.stream_type === 'Polytechnic' || col.type === 'Polytechnic' || col.name.toLowerCase().includes('polytechnic');
+            const isArtsScience = col.stream_type === 'Commerce/Arts' || col.name.toLowerCase().includes('arts') || col.name.toLowerCase().includes('loyola') || col.name.toLowerCase().includes('mcc');
+            const isEngineering = !isPolytechnic && !isArtsScience;
+
             const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
             const userScore = parseFloat(computedCutoff);
             const isDirectEligible = typeof benchmark === 'number' ? userScore >= benchmark : true;
@@ -317,10 +329,14 @@ const CollegeFinder = () => {
             return (
               <div key={col.id} className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 rounded-3xl overflow-hidden transition-all shadow-xl flex flex-col justify-between group">
                 
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-44 overflow-hidden bg-slate-950">
                   <img
-                    src={COLLEGE_IMAGES[idx % COLLEGE_IMAGES.length]}
+                    src={col.image_url || COLLEGE_IMAGES[idx % COLLEGE_IMAGES.length]}
                     alt={col.name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = COLLEGE_IMAGES[idx % 3];
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
@@ -334,30 +350,38 @@ const CollegeFinder = () => {
                     </span>
                   </div>
 
-                  {typeof benchmark === 'number' && (
-                    <div className="absolute bottom-3 left-3">
-                      {isDirectEligible ? (
-                        <span className="text-[10px] px-3 py-1 bg-emerald-950/90 text-emerald-300 border border-emerald-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Direct Admission Eligible ({computedCutoff} ≥ {benchmark})</span>
-                        </span>
-                      ) : isCoreEligible ? (
-                        <span className="text-[10px] px-3 py-1 bg-cyan-950/90 text-cyan-300 border border-cyan-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-                          <span>Eligible for Core Branches / EEE / Mech / Civil</span>
-                        </span>
-                      ) : (
-                        <span className="text-[10px] px-3 py-1 bg-amber-950/90 text-amber-300 border border-amber-800/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                          <span>High Cutoff Benchmark ({benchmark})</span>
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  <div className="absolute bottom-3 left-3">
+                    {isPolytechnic ? (
+                      <span className="text-[10px] px-3 py-1 bg-indigo-950/90 text-indigo-300 border border-indigo-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>SSLC 10th / 12th Merit Diploma Admission</span>
+                      </span>
+                    ) : isArtsScience ? (
+                      <span className="text-[10px] px-3 py-1 bg-purple-950/90 text-purple-300 border border-purple-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                        <span>12th HSC Marks Based Merit Allocation</span>
+                      </span>
+                    ) : isDirectEligible ? (
+                      <span className="text-[10px] px-3 py-1 bg-emerald-950/90 text-emerald-300 border border-emerald-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Direct Admission Eligible ({computedCutoff} ≥ {benchmark})</span>
+                      </span>
+                    ) : isCoreEligible ? (
+                      <span className="text-[10px] px-3 py-1 bg-cyan-950/90 text-cyan-300 border border-cyan-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Eligible for Core Branches / EEE / Mech / Civil</span>
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-3 py-1 bg-amber-950/90 text-amber-300 border border-amber-800/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                        <span>High Cutoff Benchmark ({benchmark})</span>
+                      </span>
+                    )}
+                  </div>
 
-                  <div className="absolute top-3 right-3 flex items-center space-x-1 bg-amber-950/90 text-amber-300 border border-amber-800/80 px-2.5 py-0.5 rounded-lg text-xs font-bold">
+                  <div className="absolute top-3 right-3 flex items-center space-x-1 bg-amber-950/90 text-amber-300 border border-amber-800/80 px-2.5 py-0.5 rounded-lg text-xs font-bold backdrop-blur-md">
                     <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                    <span>4.8</span>
+                    <span>{getCollegeRating(col, idx)}</span>
                   </div>
                 </div>
 

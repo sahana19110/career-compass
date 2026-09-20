@@ -49,7 +49,7 @@ const Sidebar = ({ activeTab, setActiveTab, user, onLogout, currentLang, setCurr
               onChange={(e) => setCurrentLang(e.target.value)}
               className="bg-transparent text-xs text-slate-200 focus:outline-none font-bold cursor-pointer w-full"
             >
-              <option value="en" className="bg-slate-900 text-white">🇬🇧 English</option>
+              <option value="en" className="bg-slate-900 text-white">English</option>
               <option value="ta" className="bg-slate-900 text-white">🇮🇳 தமிழ் (Tamil)</option>
               <option value="hi" className="bg-slate-900 text-white">🇮🇳 हिंदी (Hindi)</option>
               <option value="te" className="bg-slate-900 text-white">🇮🇳 తెలుగు (Telugu)</option>

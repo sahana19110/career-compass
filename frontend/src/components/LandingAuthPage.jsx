@@ -226,7 +226,7 @@ const LandingAuthPage = ({ onLoginSuccess, currentLang, setCurrentLang }) => {
                 className="w-full py-3 px-3.5 mb-4 sm:mb-6 rounded-2xl bg-gradient-to-r from-emerald-500/25 via-teal-500/25 to-cyan-500/25 border border-emerald-500/50 text-emerald-300 text-xs font-extrabold flex items-center justify-center space-x-2 transition-all shadow-lg"
               >
                 <Zap className="w-3.5 h-3.5 text-emerald-300 fill-current" />
-                <span>⚡ Instant 1-Click Demo Login</span>
+                <span>Instant 1-Click Demo Login</span>
               </button>
 
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
