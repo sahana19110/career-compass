@@ -44,13 +44,14 @@ const ALL_38_DISTRICTS = [
   "Virudhunagar"
 ];
 
-const COLLEGE_IMAGES = [
-  "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=600&q=80"
+const GRADIENT_VARIANTS = [
+  "from-indigo-900 via-slate-900 to-indigo-950",
+  "from-cyan-900 via-slate-900 to-cyan-950",
+  "from-purple-900 via-slate-900 to-purple-950",
+  "from-rose-900 via-slate-900 to-rose-950",
+  "from-emerald-900 via-slate-900 to-emerald-950",
+  "from-amber-900 via-slate-900 to-amber-950",
+  "from-blue-900 via-slate-900 to-blue-950"
 ];
 
 const getCollegeRating = (col, idx) => {
@@ -61,9 +62,14 @@ const getCollegeRating = (col, idx) => {
 
 const getCollegeInitials = (name) => {
   if (!name) return 'TN';
-  const words = name.replace(/\([^)]*\)/g, '').split(/\s+/).filter(Boolean);
-  if (words.length === 1) return words[0].slice(0, 3).toUpperCase();
-  return words.slice(0, 3).map(w => w[0]).join('').toUpperCase();
+  const match = name.match(/\(([^)]+)\)/);
+  if (match && match[1].length <= 6) {
+    return match[1];
+  }
+  const noise = ['of', 'and', '&', 'for', 'the', 'in', 'at'];
+  const words = name.replace(/[^a-zA-Z0-9\s]/g, '').split(/\s+/).filter(w => !noise.includes(w.toLowerCase()));
+  if (words.length === 1) return words[0].substring(0, 3).toUpperCase();
+  return words.map(w => w[0]).join('').substring(0, 4).toUpperCase();
 };
 
 const CollegeFinder = () => {
@@ -76,6 +82,7 @@ const CollegeFinder = () => {
 
   const [isWakingUp, setIsWakingUp] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [failedImages, setFailedImages] = useState({});
 
   // TNEA Cutoff Calculator & Prediction State
   const [mathsMarks, setMathsMarks] = useState(65);
@@ -364,20 +371,33 @@ const CollegeFinder = () => {
             const isDirectEligible = typeof benchmark === 'number' ? userScore >= benchmark : true;
             const isCoreEligible = typeof benchmark === 'number' ? (userScore >= benchmark - 20 && userScore < benchmark) : false;
 
+            const hasPhoto = col.image_url && col.image_url.trim() !== '' && !failedImages[col.id];
+            const gradientBg = GRADIENT_VARIANTS[idx % GRADIENT_VARIANTS.length];
+            const initials = getCollegeInitials(col.name);
+
             return (
               <div key={col.id} className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 rounded-3xl overflow-hidden transition-all shadow-xl flex flex-col justify-between group">
                 
-                <div className="relative h-44 overflow-hidden bg-slate-950">
-                  <img
-                    src={col.image_url || COLLEGE_IMAGES[idx % COLLEGE_IMAGES.length]}
-                    alt={col.name}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = COLLEGE_IMAGES[idx % 3];
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                <div className={`relative h-44 overflow-hidden bg-gradient-to-br ${gradientBg} flex items-center justify-center`}>
+                  {hasPhoto ? (
+                    <img
+                      src={col.image_url}
+                      alt={col.name}
+                      onError={() => {
+                        setFailedImages((prev) => ({ ...prev, [col.id]: true }));
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-4 text-center select-none">
+                      <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-xl mb-1">
+                        <span className="text-2xl font-black text-amber-300 tracking-widest">{initials}</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-300/90 max-w-[240px] truncate">{col.name}</span>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent pointer-events-none"></div>
                   
                   <div className="absolute top-3 left-3 flex items-center space-x-2">
                     <span className="text-[10px] px-2.5 py-1 rounded-full bg-slate-950/80 text-cyan-300 border border-cyan-700/60 font-extrabold backdrop-blur-md">
@@ -422,7 +442,7 @@ const CollegeFinder = () => {
                     <span>{getCollegeRating(col, idx)}</span>
                   </div>
 
-                  {col.photo_attribution && (
+                  {hasPhoto && col.photo_attribution && (
                     <div className="absolute bottom-1 right-2 text-[8px] text-slate-300/80 bg-slate-950/75 px-1.5 py-0.5 rounded backdrop-blur-xs max-w-[160px] truncate pointer-events-none">
                       📷 {col.photo_attribution}
                     </div>

@@ -126,7 +126,7 @@ const AIChatbot = ({ user }) => {
             </div>
 
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed ${
+              className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed whitespace-pre-line ${
                 msg.sender === 'user'
                   ? 'bg-cyan-600 text-white rounded-tr-none'
                   : 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-tl-none shadow-md'
