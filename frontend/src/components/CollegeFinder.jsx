@@ -1,47 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, GraduationCap, ExternalLink, CheckCircle, Star, Calculator, Award, Sparkles, Filter, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Search, MapPin, GraduationCap, ExternalLink, CheckCircle, Star, Calculator, Award, Sparkles, Filter, CheckCircle2, AlertCircle, TrendingUp, ShieldCheck, ArrowUpDown } from 'lucide-react';
 import axios from 'axios';
 
 const ALL_38_DISTRICTS = [
   "All Districts (38 Districts)",
-  "Ariyalur",
-  "Chengalpattu",
-  "Chennai",
-  "Coimbatore",
-  "Cuddalore",
-  "Dharmapuri",
-  "Dindigul",
-  "Erode",
-  "Kallakurichi",
-  "Kanchipuram",
-  "Kanyakumari",
-  "Karur",
-  "Krishnagiri",
-  "Madurai",
-  "Mayiladuthurai",
-  "Nagapattinam",
-  "Namakkal",
-  "Nilgiris",
-  "Perambalur",
-  "Pudukkottai",
-  "Ramanathapuram",
-  "Ranipet",
-  "Salem",
-  "Sivaganga",
-  "Tenkasi",
-  "Thanjavur",
-  "Theni",
-  "Thoothukudi",
-  "Tiruchirappalli",
-  "Tirunelveli",
-  "Tirupathur",
-  "Tiruppur",
-  "Tiruvallur",
-  "Tiruvannamalai",
-  "Tiruvarur",
-  "Vellore",
-  "Viluppuram",
-  "Virudhunagar"
+  "Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri",
+  "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur",
+  "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris",
+  "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga",
+  "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli",
+  "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore",
+  "Viluppuram", "Virudhunagar"
 ];
 
 const GRADIENT_VARIANTS = [
@@ -78,6 +47,8 @@ const CollegeFinder = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('All Districts (38 Districts)');
   const [selectedType, setSelectedType] = useState('All');
   const [selectedStream, setSelectedStream] = useState('All');
+  const [onlyNirf, setOnlyNirf] = useState(false);
+  const [sortBy, setSortBy] = useState('cutoff'); // 'cutoff', 'rating', 'fees'
   const [loading, setLoading] = useState(false);
 
   const [isWakingUp, setIsWakingUp] = useState(false);
@@ -107,14 +78,13 @@ const CollegeFinder = () => {
       setIsWakingUp(true);
     }, 5000);
 
-    const cleanDistrict = selectedDistrict.includes("All Districts") ? undefined : selectedDistrict;
     try {
       const res = await axios.get('/api/colleges', {
         params: {
-          search: search || undefined,
-          district: cleanDistrict,
-          type: selectedType !== 'All' ? selectedType : undefined,
-          stream_type: selectedStream !== 'All' ? selectedStream : undefined
+          district: selectedDistrict,
+          type: selectedType,
+          stream_type: selectedStream,
+          search: search
         }
       });
       setColleges(res.data.colleges);
@@ -130,23 +100,49 @@ const CollegeFinder = () => {
 
   useEffect(() => {
     fetchColleges();
-  }, [search, selectedDistrict, selectedType, selectedStream]);
+  }, [selectedDistrict, selectedType, selectedStream, search]);
 
-  // Cutoff Predictor Filter: Show colleges eligible for direct or core branch admission for student's score
-  const displayedColleges = filterByCutoff
-    ? colleges.filter((col) => {
-        const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
-        if (typeof benchmark === 'number') {
-          return parseFloat(computedCutoff) >= (benchmark - 20);
-        }
-        return true;
-      })
-    : colleges;
+  // Combined Filter & Sort Pipeline
+  let processedColleges = colleges.filter((col) => {
+    // Cutoff Eligibility Filter
+    if (filterByCutoff) {
+      const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
+      if (typeof benchmark === 'number' && parseFloat(computedCutoff) < benchmark) {
+        return false;
+      }
+    }
+    // NIRF Top Ranked Filter
+    if (onlyNirf) {
+      if (!col.nirf_rank || col.nirf_rank.includes('State Govt') || col.nirf_rank.includes('Autonomous')) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  // Sorting Logic
+  processedColleges.sort((a, b) => {
+    if (sortBy === 'rating') {
+      return (b.rating || 4.8) - (a.rating || 4.8);
+    }
+    if (sortBy === 'fees') {
+      const parseFees = (fStr) => {
+        if (!fStr) return 999999;
+        const num = fStr.replace(/[^0-9]/g, '');
+        return parseInt(num, 10) || 999999;
+      };
+      return parseFees(a.fees_per_year) - parseFees(b.fees_per_year);
+    }
+    // Default Cutoff Benchmark (High to Low)
+    const cutA = a.cutoff_marks[selectedCommunity] || a.cutoff_marks.BC || a.cutoff_marks.OC || 160;
+    const cutB = b.cutoff_marks[selectedCommunity] || b.cutoff_marks.BC || b.cutoff_marks.OC || 160;
+    return (typeof cutB === 'number' ? cutB : 0) - (typeof cutA === 'number' ? cutA : 0);
+  });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       
-      {/* Header Banner with TNEA Calculator Toggle */}
+      {/* Header Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950/80 border border-slate-700/60 rounded-3xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
@@ -155,7 +151,7 @@ const CollegeFinder = () => {
               <span>Tamil Nadu Colleges & TNEA Admission Allocation Predictor</span>
             </h2>
             <p className="text-xs text-slate-300 mt-1">
-              Filter institutions across all 38 districts and predict your admission eligibility based on previous years' TNEA cutoffs.
+              Filter institutions across all 38 districts with NIRF ranks, verified placement metrics, and admission cutoffs.
             </p>
           </div>
 
@@ -252,8 +248,8 @@ const CollegeFinder = () => {
           </div>
         )}
 
-        {/* 38 District Filter Controls */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Filter & Sorting Toolbar */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           
           <div className="relative lg:col-span-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
@@ -297,71 +293,79 @@ const CollegeFinder = () => {
               onChange={(e) => setSelectedType(e.target.value)}
               className="w-full bg-slate-950 border border-slate-700/80 rounded-2xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500 font-medium"
             >
-              <option value="All">All Management Types</option>
-              <option value="Government">Government / Autonomous</option>
+              <option value="All">All Types</option>
+              <option value="Government Autonomous">Government Autonomous</option>
+              <option value="Government Aided">Government Aided</option>
+              <option value="Private Autonomous">Private Autonomous</option>
               <option value="Polytechnic">Polytechnic</option>
-              <option value="Private">Private Autonomous</option>
             </select>
           </div>
 
+          <div className="relative flex items-center space-x-2">
+            <button
+              onClick={() => setOnlyNirf(!onlyNirf)}
+              className={`flex-1 py-2.5 px-3 rounded-2xl text-xs font-bold border flex items-center justify-center space-x-1.5 transition-all ${
+                onlyNirf
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-lg shadow-amber-500/10'
+                  : 'bg-slate-950 text-slate-400 border-slate-700/80 hover:text-slate-200'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5 text-amber-400" />
+              <span>{onlyNirf ? '🏆 NIRF Top Ranked Only' : 'Filter Top NIRF'}</span>
+            </button>
+          </div>
+
         </div>
+
       </div>
 
-      {/* Filter Status Subheader */}
-      {filterByCutoff && (
-        <div className="bg-emerald-950/80 border border-emerald-700/80 rounded-2xl p-4 flex items-center justify-between text-xs text-emerald-300">
-          <div className="flex items-center space-x-2 font-bold">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span>Showing colleges matching cutoff score ({computedCutoff}) for {selectedCommunity} quota!</span>
-          </div>
-          <button
-            onClick={() => setFilterByCutoff(false)}
-            className="text-[11px] underline font-bold hover:text-white"
-          >
-            Show All Colleges
-          </button>
+      {/* Server Waking Up Notice Banner */}
+      {isWakingUp && (
+        <div className="p-4 bg-amber-950/80 border border-amber-500/50 rounded-2xl text-amber-300 text-xs font-bold flex items-center space-x-3 animate-pulse shadow-xl">
+          <AlertCircle className="w-5 h-5 shrink-0 text-amber-400" />
+          <span>Render free server waking up from sleep mode. Please wait 10-15 seconds for real-time college dataset...</span>
         </div>
       )}
 
-      {/* College Cards Grid */}
-      {isError ? (
-        <div className="bg-rose-950/80 border border-rose-800 rounded-3xl p-8 text-center text-rose-200 space-y-3">
-          <AlertCircle className="w-8 h-8 text-rose-400 mx-auto" />
-          <h4 className="text-base font-bold text-white">Couldn't load colleges, try again</h4>
-          <p className="text-xs text-rose-300">The free backend server may be waking up from sleep mode.</p>
+      {/* Loading & Error States */}
+      {loading ? (
+        <div className="p-16 text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="font-bold text-slate-200 text-sm">Fetching Colleges & TNEA Benchmarks across Tamil Nadu...</p>
+        </div>
+      ) : isError ? (
+        <div className="p-12 text-center bg-rose-950/40 border border-rose-800/60 rounded-3xl space-y-3">
+          <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
+          <h4 className="text-base font-bold text-white">Temporary Network Error</h4>
+          <p className="text-xs text-slate-400">Could not fetch college data from backend service.</p>
           <button
             onClick={fetchColleges}
-            className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-lg"
+            className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold"
           >
             🔄 Retry Fetching Colleges
           </button>
         </div>
-      ) : loading ? (
-        <div className="py-16 text-center text-slate-400 text-sm space-y-3">
-          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="font-bold text-slate-200">Fetching Colleges across Tamil Nadu...</p>
-          {isWakingUp && (
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-amber-950/80 text-amber-300 border border-amber-800/80 text-xs font-bold animate-pulse">
-              <AlertCircle className="w-4 h-4 text-amber-400" />
-              <span>Server is waking up, please wait...</span>
-            </div>
-          )}
-        </div>
-      ) : displayedColleges.length === 0 ? (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 text-center text-slate-400 space-y-2">
-          <AlertCircle className="w-8 h-8 text-amber-400 mx-auto" />
-          <h4 className="text-base font-bold text-white">No Colleges Found Matching Cutoff ({computedCutoff})</h4>
-          <p className="text-xs text-slate-400">Click below to view all colleges or check core branch allocations.</p>
+      ) : processedColleges.length === 0 ? (
+        <div className="mt-8 p-12 text-center bg-slate-900/60 rounded-3xl border border-slate-800 space-y-3">
+          <AlertCircle className="w-10 h-10 text-amber-400 mx-auto" />
+          <h4 className="text-base font-bold text-white">No Colleges Found Matching Criteria</h4>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            Try resetting your filters or cutoff eligibility setting to view all institutions.
+          </p>
           <button
-            onClick={() => setFilterByCutoff(false)}
+            onClick={() => {
+              setFilterByCutoff(false);
+              setOnlyNirf(false);
+              setSearch('');
+            }}
             className="mt-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold"
           >
-            Disable Cutoff Filter & Show All Colleges
+            Reset Filters & Show All Colleges
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {displayedColleges.map((col, idx) => {
+          {processedColleges.map((col, idx) => {
             const isPolytechnic = col.stream_type === 'Polytechnic' || col.type === 'Polytechnic' || col.name.toLowerCase().includes('polytechnic');
             const isArtsScience = col.stream_type === 'Commerce/Arts' || col.name.toLowerCase().includes('arts') || col.name.toLowerCase().includes('loyola') || col.name.toLowerCase().includes('mcc');
             const isEngineering = !isPolytechnic && !isArtsScience;
@@ -378,6 +382,7 @@ const CollegeFinder = () => {
             return (
               <div key={col.id} className="bg-slate-900/90 border border-slate-800 hover:border-cyan-500/50 rounded-3xl overflow-hidden transition-all shadow-xl flex flex-col justify-between group">
                 
+                {/* Photo & Header Overlay */}
                 <div className={`relative h-44 overflow-hidden bg-gradient-to-br ${gradientBg} flex items-center justify-center`}>
                   {hasPhoto ? (
                     <img
@@ -398,15 +403,23 @@ const CollegeFinder = () => {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent pointer-events-none"></div>
                   
-                  <div className="absolute top-3 left-3 flex items-center space-x-2">
+                  {/* Top Left Badges */}
+                  <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 max-w-[75%]">
                     <span className="text-[10px] px-2.5 py-1 rounded-full bg-slate-950/80 text-cyan-300 border border-cyan-700/60 font-extrabold backdrop-blur-md">
-                      📍 {col.district} District
+                      📍 {col.district}
                     </span>
                     <span className="text-[10px] px-2.5 py-1 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 font-extrabold backdrop-blur-md">
                       {col.type}
                     </span>
+                    {col.nirf_rank && (
+                      <span className="text-[10px] px-2.5 py-1 rounded-full bg-amber-950/90 text-amber-300 border border-amber-600/70 font-extrabold backdrop-blur-md flex items-center space-x-1">
+                        <Award className="w-3 h-3 text-amber-400" />
+                        <span>{col.nirf_rank}</span>
+                      </span>
+                    )}
                   </div>
 
+                  {/* Admission Eligibility Badge */}
                   <div className="absolute bottom-3 left-3">
                     {isPolytechnic ? (
                       <span className="text-[10px] px-3 py-1 bg-indigo-950/90 text-indigo-300 border border-indigo-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
@@ -436,11 +449,13 @@ const CollegeFinder = () => {
                     )}
                   </div>
 
+                  {/* Rating Badge */}
                   <div className="absolute top-3 right-3 flex items-center space-x-1 bg-amber-950/90 text-amber-300 border border-amber-800/80 px-2.5 py-0.5 rounded-lg text-xs font-bold backdrop-blur-md">
                     <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                     <span>{getCollegeRating(col, idx)}</span>
                   </div>
 
+                  {/* Photo Credit */}
                   {hasPhoto && col.photo_attribution && (
                     <div className="absolute bottom-1 right-2 text-[8px] text-slate-300/80 bg-slate-950/75 px-1.5 py-0.5 rounded backdrop-blur-xs max-w-[160px] truncate pointer-events-none">
                       📷 {col.photo_attribution}
@@ -448,15 +463,32 @@ const CollegeFinder = () => {
                   )}
                 </div>
 
+                {/* Card Main Body */}
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-white mb-1 group-hover:text-cyan-400 transition-colors leading-snug">
                       {col.name}
                     </h3>
-                    <p className="text-xs text-slate-400 flex items-center space-x-1 mb-4">
+                    <p className="text-xs text-slate-400 flex items-center space-x-1 mb-3">
                       <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                       <span>{col.location}, {col.district} District, {col.state}</span>
                     </p>
+
+                    {/* Placement Stats & NAAC Accreditation */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                      {col.placement_stats && (
+                        <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-emerald-500/30 text-[11px] font-semibold text-emerald-400 flex items-center space-x-1.5">
+                          <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span className="truncate">{col.placement_stats}</span>
+                        </div>
+                      )}
+                      {col.accreditation && (
+                        <div className="px-3 py-1.5 rounded-xl bg-slate-950 border border-indigo-500/30 text-[11px] font-semibold text-indigo-300 flex items-center space-x-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                          <span className="truncate">{col.accreditation}</span>
+                        </div>
+                      )}
+                    </div>
 
                     <div className="mb-4">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Key Degrees & Programs Offered:</span>
