@@ -3,7 +3,100 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 import re
 import difflib
+import os
+import logging
 from ai_engine import detect_domain
+
+# ─── Gemini AI Setup ───────────────────────────────────────────────────────────
+_gemini_model = None
+
+def _get_gemini_model():
+    """Lazy-load Gemini model — only once, only if API key is available."""
+    global _gemini_model
+    if _gemini_model is not None:
+        return _gemini_model
+    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        return None
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        _gemini_model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            generation_config={
+                "temperature": 0.7,
+                "max_output_tokens": 600,
+            },
+            system_instruction=(
+                "You are Ascentia AI — a friendly, expert Career & Education Guidance chatbot "
+                "built specifically for students in Tamil Nadu, India. You were created by Sahana Balaji.\n\n"
+                "Your primary focus areas:\n"
+                "• Career guidance for ANY career (Doctor, Engineer, Lawyer, Pilot, Chef, Designer, Teacher, Farmer, etc.)\n"
+                "• Tamil Nadu education system: TNEA, NEET, TN board, TANCET, TNPSC\n"
+                "• Colleges in Tamil Nadu: Anna University affiliates, medical colleges, arts & science, law schools\n"
+                "• Scholarships: Pudhumai Penn, BC/MBC/SC/ST schemes, NSP, First Graduate, 7.5% quota\n"
+                "• NSQF skill levels 1–10 and vocational training\n"
+                "• Skill roadmaps, upskilling, free online resources\n"
+                "• Job market, salary ranges in India, career progression\n\n"
+                "Rules:\n"
+                "1. ALWAYS respond helpfully to ANY message — never say you cannot help.\n"
+                "2. If the message is casual (greetings, jokes, small talk) — respond warmly and briefly, then gently steer back to career/education.\n"
+                "3. If the message is about a career — give a concise, accurate, actionable answer.\n"
+                "4. Never invent specific cutoff scores, college rankings, or scholarship deadlines. If unsure, say so clearly.\n"
+                "5. Use simple English (or Tamil/Hindi if the user writes in that language).\n"
+                "6. Keep responses under 250 words. Use bullet points for clarity.\n"
+                "7. End with a helpful follow-up question or suggestion when relevant.\n"
+                "8. NEVER say 'I am a large language model' or mention Google or Gemini — you are Ascentia AI."
+            )
+        )
+        logging.info("Gemini model loaded successfully.")
+        return _gemini_model
+    except Exception as e:
+        logging.warning(f"Gemini model init failed: {e}")
+        return None
+
+
+def call_gemini(user_message: str, user_name: str = None, education: str = None,
+                target_career: str = None, history: list = None) -> str:
+    """Call Gemini API with user context. Returns response text or None on failure."""
+    model = _get_gemini_model()
+    if model is None:
+        return None
+    try:
+        context_parts = []
+        if user_name:
+            context_parts.append(f"Student name: {user_name}")
+        if education:
+            context_parts.append(f"Current education: {education}")
+        if target_career:
+            context_parts.append(f"Target career: {target_career}")
+        
+        context_prefix = ""
+        if context_parts:
+            context_prefix = "[Student context: " + ", ".join(context_parts) + "]\n\n"
+        
+        # Build conversation history for multi-turn
+        chat_history = []
+        if history:
+            for turn in history[-6:]:  # Last 6 turns for context
+                role = turn.get("role", "user")
+                content = turn.get("content", "")
+                if content:
+                    chat_history.append({
+                        "role": "user" if role == "user" else "model",
+                        "parts": [content]
+                    })
+        
+        if chat_history:
+            chat = model.start_chat(history=chat_history)
+            response = chat.send_message(context_prefix + user_message)
+        else:
+            response = model.generate_content(context_prefix + user_message)
+        
+        return response.text.strip()
+    except Exception as e:
+        logging.warning(f"Gemini call failed: {e}")
+        return None
 
 router = APIRouter(prefix="/api/chat", tags=["AI Chatbot"])
 
@@ -356,13 +449,17 @@ def chat_with_ai(req: ChatRequest):
         elif "nsqf" in msg_lower or "திறன்" in msg_lower:
             response_text = TAMIL_RESPONSES["nsqf"]
         else:
-            response_text = (
-                "மன்னித்துக்கொள்ளுங்கள், உங்கள் கேள்வி தெளிவாக இல்லை.\n\n"
-                "நான் உதவக்கூடிய பகுதிகள்:\n\n"
-                "• TNEA & NEET கட் ஆஃப் கணக்கீடு\n"
-                "• தமிழ்நாடு அரசு உதவித்தொகை திட்டங்கள்\n"
-                "• NSQF தொழில் நுட்ப பயிற்சி நிலைகள்\n"
-                "• 10/12-ஆம் வகுப்பிற்குப் பிந்தைய படிப்புகள் & வேலைவாய்ப்புகள்!"
+            # Use Gemini for any Tamil message not matched by keywords
+            gemini_reply = call_gemini(
+                user_message=msg,
+                user_name=req.user_name,
+                education=req.education,
+                target_career=req.target_career,
+                history=req.history or []
+            )
+            response_text = gemini_reply if gemini_reply else (
+                "வணக்கம்! நான் உங்களுக்கு கல்வி மற்றும் தொழில் வழிகாட்டுதல் வழங்க தயாராக இருக்கிறேன். 😊\n\n"
+                "உங்கள் கேள்வியை கொஞ்சம் மேலும் விவரமாக கேட்கலாமா?"
             )
         return {
             "reply": response_text,
@@ -584,15 +681,35 @@ def chat_with_ai(req: ChatRequest):
             "and escalating to NSQF Level 6 (Advanced AI/ML & PyTorch). Average starting salary ranges from ₹4.5L to ₹7.5L PA."
         )
     else:
-        # Honest Fallback Message
+        # ── Gemini AI Fallback: handles ANY message intelligently ──────────────
+        gemini_reply = call_gemini(
+            user_message=msg,
+            user_name=req.user_name,
+            education=req.education,
+            target_career=req.target_career,
+            history=req.history or []
+        )
+        if gemini_reply:
+            return {
+                "reply": gemini_reply,
+                "suggested_actions": [
+                    "Calculate TNEA Cutoff",
+                    "Which course is best for me?",
+                    "View Scholarships",
+                    "Options after 12th"
+                ]
+            }
+        # Final static fallback (only if Gemini is not configured or fails)
         response_text = (
-            "I'm not sure about that specific query yet. I can help you with:\n\n"
-            "• 🧮 TNEA & NEET Cutoff Calculations (e.g., '99 in Maths, 69 in Physics, 81 in Chemistry')\n"
-            "• 🎓 Career Options after 10th & 12th (Medicine, Engineering, Law, Teaching, Commerce)\n"
-            "• 💰 Tamil Nadu Scholarships & Grants\n"
+            "I'm here to help! 😊 You can ask me about:\n\n"
+            "• 🎯 Any career path — Doctor, Engineer, Pilot, Chef, Designer, Lawyer...\n"
+            "• 🧮 TNEA & NEET Cutoff Calculations\n"
+            "• 🎓 Options after 10th & 12th\n"
+            "• 🏛️ Colleges in Tamil Nadu\n"
+            "• 💰 Scholarships & Grants\n"
             "• 📜 NSQF Skill Levels 1–10\n"
-            "• 📈 Job & Hiring Salary Trends\n\n"
-            "Feel free to ask about any of these!"
+            "• 📈 Job & Salary Trends\n\n"
+            "Just type your question — I'll do my best to help!"
         )
 
     return {
