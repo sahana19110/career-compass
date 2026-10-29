@@ -158,13 +158,10 @@ career-compass/
 
 ## 👤 Author
 
-**Sahana Balaji**
+**Sahana **
 *Full-Stack & AI Developer*
 
 - **GitHub**: [sahana19110](https://github.com/sahana19110)
 
 ---
 
-## 📄 License
-
-This project is built for educational purposes as a career guidance tool for students.
