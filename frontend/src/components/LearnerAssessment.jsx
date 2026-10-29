@@ -2,15 +2,43 @@ import React, { useState } from 'react';
 import { Sparkles, UserCheck, Code, Target, MapPin, Zap, ArrowRight, Compass, CheckCircle2, ChevronRight, Award, HelpCircle } from 'lucide-react';
 import axios from 'axios';
 
+const CAREER_CATEGORIES = [
+  { id: 'all', label: '🌟 All Disciplines' },
+  { id: 'medical', label: '🩺 Medical & Health' },
+  { id: 'tech', label: '💻 Tech & Engineering' },
+  { id: 'aviation_design', label: '✈️ Aviation & Design' },
+  { id: 'law_commerce', label: '⚖️ Law & Commerce' },
+  { id: 'agri_sciences', label: '🌾 Agriculture & Sciences' }
+];
+
 const CAREER_PRESETS = [
-  { label: '🩺 Doctor / Medicine (MBBS)', value: 'Doctor', stream: '12th_PCB', skill: 'Biology, Anatomy' },
-  { label: '💻 Software Developer', value: 'Software Developer', stream: '12th_PCM', skill: 'Python, React, DSA' },
-  { label: '🏗️ Civil Engineer', value: 'Civil Engineer', stream: '12th_PCM', skill: 'AutoCAD, BIM, Mechanics' },
-  { label: '📊 Data Scientist', value: 'Data Scientist', stream: '12th_PCM', skill: 'Python, Statistics, SQL' },
-  { label: '⚖️ Lawyer / Advocate', value: 'Lawyer', stream: '12th_Commerce', skill: 'Constitutional Law, Debate' },
-  { label: '🎓 Teacher / Educator', value: 'Teacher', stream: 'UG', skill: 'Pedagogy, Child Psychology' },
-  { label: '⚡ EV Automotive Tech', value: 'EV Automotive Specialist', stream: '12th_PCM', skill: 'Battery BMS, Embedded C' },
-  { label: '💼 Chartered Accountant / BFSI', value: 'Chartered Accountant', stream: '12th_Commerce', skill: 'Tally Prime, GST, Tax' }
+  // Medical & Health
+  { label: '🩺 Doctor / Medicine (MBBS)', value: 'Doctor', stream: '12th_PCB', skill: 'Biology, Anatomy, Physiology', category: 'medical' },
+  { label: '💊 Pharmacist / Pharma R&D', value: 'Pharmacist', stream: '12th_PCB', skill: 'Pharmacology, Chemistry, Formulations', category: 'medical' },
+  { label: '🧠 Clinical Psychologist', value: 'Clinical Psychologist', stream: '12th_Commerce', skill: 'Psychology, Counseling, CBT', category: 'medical' },
+  { label: '🧬 Biotechnologist', value: 'Biotechnologist', stream: '12th_PCB', skill: 'Genetics, Bioinformatics, Cell Biology', category: 'medical' },
+
+  // Tech & Engineering
+  { label: '💻 Software Developer', value: 'Software Developer', stream: '12th_PCM', skill: 'Python, React, DSA', category: 'tech' },
+  { label: '📊 Data Scientist & AI', value: 'Data Scientist', stream: '12th_PCM', skill: 'Python, Statistics, SQL', category: 'tech' },
+  { label: '🤖 Robotics Engineer', value: 'Robotics Engineer', stream: '12th_PCM', skill: 'ROS, C++, Circuit Design, Mechatronics', category: 'tech' },
+  { label: '🏗️ Civil Engineer', value: 'Civil Engineer', stream: '12th_PCM', skill: 'AutoCAD, BIM, Mechanics', category: 'tech' },
+  { label: '⚡ EV Automotive Tech', value: 'EV Automotive Specialist', stream: '12th_PCM', skill: 'Battery BMS, Embedded C, Power Electronics', category: 'tech' },
+  { label: '🛡️ Cyber Security Analyst', value: 'Cyber Security Analyst', stream: '12th_PCM', skill: 'Network Defense, Ethical Hacking, SIEM', category: 'tech' },
+
+  // Aviation & Design
+  { label: '✈️ Commercial Pilot', value: 'Commercial Pilot', stream: '12th_PCM', skill: 'Air Navigation, Flight Dynamics, Meteorology', category: 'aviation_design' },
+  { label: '🎨 UI/UX & Fashion Designer', value: 'Fashion Designer', stream: '12th_Commerce', skill: 'Figma, Illustration, CLO 3D, Design Systems', category: 'aviation_design' },
+  { label: '🎬 3D Animator', value: '3D Animator', stream: '12th_Commerce', skill: 'Blender, 3D Modeling, Character Animation', category: 'aviation_design' },
+
+  // Law, Commerce & Teaching
+  { label: '⚖️ Lawyer / Advocate', value: 'Lawyer', stream: '12th_Commerce', skill: 'Constitutional Law, Debate, Legal Drafting', category: 'law_commerce' },
+  { label: '💼 Chartered Accountant / BFSI', value: 'Chartered Accountant', stream: '12th_Commerce', skill: 'Tally Prime, GST, Tax, Financial Modeling', category: 'law_commerce' },
+  { label: '🎓 Teacher / Educator', value: 'Teacher', stream: 'UG', skill: 'Pedagogy, Child Psychology, Lesson Planning', category: 'law_commerce' },
+
+  // Agriculture & Sciences
+  { label: '🌾 Agricultural Scientist', value: 'Agricultural Scientist', stream: '12th_PCB', skill: 'Agronomy, Precision Drones, Soil Science', category: 'agri_sciences' },
+  { label: '🍳 Culinary Arts Specialist', value: 'Culinary Arts Specialist', stream: '12th_Commerce', skill: 'Food Science, Kitchen Operations, Hospitality', category: 'agri_sciences' }
 ];
 
 const DISCOVERY_QUESTIONS = [
@@ -21,6 +49,12 @@ const DISCOVERY_QUESTIONS = [
     options: [
       { text: "🧬 Biological sciences, human anatomy, medical diagnostics & healthcare", domain: "Doctor", stream: "12th_PCB", skill: "Biology, Clinical Care" },
       { text: "💻 Writing code, building software apps & algorithmic logic", domain: "Software Developer", stream: "12th_PCM", skill: "Python, Web Development" },
+      { text: "✈️ Aircraft aerodynamics, flight physics, navigation & aviation", domain: "Commercial Pilot", stream: "12th_PCM", skill: "Air Navigation, Flight Dynamics" },
+      { text: "🎨 Visual aesthetics, fashion styling, digital UI/UX & creative illustration", domain: "Fashion Designer", stream: "12th_Commerce", skill: "Figma, Illustration, CAD" },
+      { text: "🌾 Plant biology, precision drones, sustainable agriculture & farming", domain: "Agricultural Scientist", stream: "12th_PCB", skill: "Agronomy, Soil Science" },
+      { text: "💊 Pharmacology, medicinal chemistry, clinical trials & drug discovery", domain: "Pharmacist", stream: "12th_PCB", skill: "Pharmacology, Formulations" },
+      { text: "🤖 Robotics, microcontrollers, embedded circuits & mechatronics", domain: "Robotics Engineer", stream: "12th_PCM", skill: "ROS, Embedded C++, Mechatronics" },
+      { text: "🧠 Human psychology, counseling, cognitive therapy & behavioral science", domain: "Clinical Psychologist", stream: "12th_Commerce", skill: "Psychology, Counseling, CBT" },
       { text: "🏗️ Architecture, structural blueprints, roads, bridges & buildings", domain: "Civil Engineer", stream: "12th_PCM", skill: "AutoCAD, Structural Design" },
       { text: "📊 Analyzing numbers, finding hidden patterns & machine learning", domain: "Data Scientist", stream: "12th_PCM", skill: "Mathematics, Python, SQL" },
       { text: "⚖️ Debating, constitutional rights, justice & legal argumentation", domain: "Lawyer", stream: "12th_Commerce", skill: "Constitutional Law, Advocacy" },
@@ -34,6 +68,12 @@ const DISCOVERY_QUESTIONS = [
     options: [
       { text: "🏥 Hospital wards, clinical surgery rooms, or diagnostic research centers", domain: "Doctor" },
       { text: "🏢 High-tech innovation hubs, agile software teams, or remote tech work", domain: "Software Developer" },
+      { text: "✈️ Modern aircraft cockpits, airport terminals & flight navigation centers", domain: "Commercial Pilot" },
+      { text: "🎨 Creative fashion studios, design ateliers & interactive digital product labs", domain: "Fashion Designer" },
+      { text: "🌾 Agricultural research farms, precision greenhouses & agritech facilities", domain: "Agricultural Scientist" },
+      { text: "💊 Pharmaceutical formulation laboratories & clinical drug R&D centers", domain: "Pharmacist" },
+      { text: "🤖 Automated smart factories, robotics test beds & hardware innovation labs", domain: "Robotics Engineer" },
+      { text: "🧠 Psychological consultation centers, counseling clinics & hospital OPDs", domain: "Clinical Psychologist" },
       { text: "🏗️ Dynamic construction sites, infrastructure planning & engineering design offices", domain: "Civil Engineer" },
       { text: "📈 Corporate analytics centers, business intelligence & data engineering labs", domain: "Data Scientist" },
       { text: "🏛️ Courtrooms, legal chambers, arbitration councils & corporate advisory firms", domain: "Lawyer" },
@@ -47,6 +87,12 @@ const DISCOVERY_QUESTIONS = [
     options: [
       { text: "🩹 Treating illnesses, saving human lives & improving community health", domain: "Doctor" },
       { text: "🚀 Developing automated digital platforms, AI tools & mobile solutions", domain: "Software Developer" },
+      { text: "✈️ Piloting air transport safely across global skies & advancing aviation", domain: "Commercial Pilot" },
+      { text: "🎨 Designing sustainable apparel lines & delightful digital user experiences", domain: "Fashion Designer" },
+      { text: "🌾 Ensuring sustainable food security, smart harvesting & crop productivity", domain: "Agricultural Scientist" },
+      { text: "💊 Developing affordable life-saving medications & clinical health therapeutics", domain: "Pharmacist" },
+      { text: "🤖 Creating intelligent autonomous robots & industrial automation systems", domain: "Robotics Engineer" },
+      { text: "🧠 Supporting mental health resilience, emotional healing & student wellbeing", domain: "Clinical Psychologist" },
       { text: "🌉 Designing earthquake-resistant bridges, smart cities & sustainable infrastructure", domain: "Civil Engineer" },
       { text: "🤖 Forecasting business trends, building predictive algorithms & data models", domain: "Data Scientist" },
       { text: "📜 Defending justice, ensuring legal compliance & protecting citizen rights", domain: "Lawyer" },
@@ -57,6 +103,7 @@ const DISCOVERY_QUESTIONS = [
 
 const LearnerAssessment = ({ onAssessmentComplete, isLoading, setIsLoading }) => {
   const [activeMode, setActiveMode] = useState('direct'); // 'direct' or 'discovery'
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Direct Mode State
   const [education, setEducation] = useState('12th_PCM');
@@ -64,6 +111,11 @@ const LearnerAssessment = ({ onAssessmentComplete, isLoading, setIsLoading }) =>
   const [targetCareer, setTargetCareer] = useState('Software Developer');
   const [location, setLocation] = useState('Chennai');
   const [pace, setPace] = useState('Standard');
+
+  // Filter presets based on category
+  const filteredPresets = selectedCategory === 'all'
+    ? CAREER_PRESETS
+    : CAREER_PRESETS.filter((p) => p.category === selectedCategory);
 
   // Discovery Mode State
   const [currentStep, setCurrentStep] = useState(0);
@@ -175,6 +227,36 @@ const LearnerAssessment = ({ onAssessmentComplete, isLoading, setIsLoading }) =>
         sectorName = "Analytics & AI";
         certBody = "NASSCOM FutureSkills";
         defSkills = ["Python Data Science", "Pandas & SQL", "Machine Learning", "Power BI"];
+      } else if (fallbackCareer.toLowerCase().includes('pilot') || fallbackCareer.toLowerCase().includes('aviat')) {
+        qualName = "Commercial Pilot License (CPL) & Aviation Operations";
+        sectorName = "Aviation & Aerospace Operations";
+        certBody = "Directorate General of Civil Aviation (DGCA) India";
+        defSkills = ["Air Navigation", "Aviation Meteorology", "Air Regulations", "Instrument Flying"];
+      } else if (fallbackCareer.toLowerCase().includes('design') || fallbackCareer.toLowerCase().includes('fashion') || fallbackCareer.toLowerCase().includes('ui')) {
+        qualName = "Bachelor of Design (B.Des) in Fashion & UI/UX Design";
+        sectorName = "Design, Fashion & Creative Arts";
+        certBody = "National Institute of Fashion Technology (NIFT) / AMHSSC";
+        defSkills = ["Figma & UI Systems", "Fashion Illustration", "Pattern Making", "Design Systems"];
+      } else if (fallbackCareer.toLowerCase().includes('pharma') || fallbackCareer.toLowerCase().includes('drug')) {
+        qualName = "Bachelor of Pharmacy (B.Pharm) & Pharmaceutical Formulations";
+        sectorName = "Pharmaceutical & Healthcare Sciences";
+        certBody = "Pharmacy Council of India (PCI)";
+        defSkills = ["Pharmaceutics", "Medicinal Chemistry", "Pharmacology", "Quality Control"];
+      } else if (fallbackCareer.toLowerCase().includes('agri') || fallbackCareer.toLowerCase().includes('farm')) {
+        qualName = "B.Sc (Hons) Agriculture & Precision Smart Farming";
+        sectorName = "Agriculture & Bio-Systems";
+        certBody = "Indian Council of Agricultural Research (ICAR) / TNAU";
+        defSkills = ["Agronomy & Crop Physiology", "Soil Science", "Precision Drone Technology", "Horticulture"];
+      } else if (fallbackCareer.toLowerCase().includes('robot')) {
+        qualName = "B.E. Robotics & Industrial Automation Systems";
+        sectorName = "Robotics & Industrial Automation";
+        certBody = "Capital Goods Skill Council / Anna University";
+        defSkills = ["Robot Operating System (ROS)", "PLC & SCADA", "Microcontrollers & C++", "Computer Vision"];
+      } else if (fallbackCareer.toLowerCase().includes('psycholog')) {
+        qualName = "B.Sc & M.Sc Clinical Psychology & Behavioral Health";
+        sectorName = "Psychology & Behavioral Health";
+        certBody = "Rehabilitation Council of India (RCI)";
+        defSkills = ["Psychological Assessment", "Cognitive Behavioral Therapy (CBT)", "Counseling Techniques", "Mental Health Triage"];
       }
 
       onAssessmentComplete({
@@ -361,14 +443,52 @@ const LearnerAssessment = ({ onAssessmentComplete, isLoading, setIsLoading }) =>
       {activeMode === 'direct' && (
         <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* Quick Preset Goal Pills */}
+          {/* Universal Career Support Callout */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-cyan-950/70 via-slate-900 to-indigo-950/70 border border-cyan-500/40 flex items-start space-x-3.5 shadow-lg">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 mt-0.5 border border-cyan-500/30">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="text-xs">
+              <div className="font-bold text-cyan-300 text-sm flex items-center space-x-2">
+                <span>💡 Ascentia AI Supports ANY Career Pathway</span>
+                <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30 font-semibold">Universal AI Engine</span>
+              </div>
+              <p className="text-slate-300 mt-1 leading-relaxed text-[11px] sm:text-xs">
+                You are not restricted to predefined buttons! You can type <strong className="text-white">ANY dream career</strong> in the box below (e.g. <em>Commercial Pilot, Chef, Marine Biologist, Fashion Designer, Animator, Sound Engineer, IAS Officer</em>) — our multi-domain AI will dynamically generate a custom 4-step NSQF qualification roadmap, required skills, and college eligibility criteria for it!
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Preset Goal Pills with Category Filter */}
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center space-x-2">
-              <Target className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Popular Career Streams in Tamil Nadu (Click to Auto-fill)</span>
-            </label>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                <Target className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Explore Career Pathways (Click to Auto-fill)</span>
+              </label>
+
+              {/* Category Filter Tabs */}
+              <div className="flex flex-wrap gap-1">
+                {CAREER_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition-all ${
+                      selectedCategory === cat.id
+                        ? 'bg-cyan-500 text-slate-950 font-extrabold shadow-sm'
+                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Presets Grid */}
             <div className="flex flex-wrap gap-2">
-              {CAREER_PRESETS.map((preset, pidx) => (
+              {filteredPresets.map((preset, pidx) => (
                 <button
                   key={pidx}
                   type="button"
@@ -382,6 +502,14 @@ const LearnerAssessment = ({ onAssessmentComplete, isLoading, setIsLoading }) =>
                   {preset.label}
                 </button>
               ))}
+            </div>
+
+            {/* Active Selected Goal Badge */}
+            <div className="mt-3 flex items-center space-x-2 text-xs">
+              <span className="text-slate-400 font-medium">🎯 Selected Career Goal:</span>
+              <span className="px-2.5 py-1 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-bold">
+                {targetCareer}
+              </span>
             </div>
           </div>
 

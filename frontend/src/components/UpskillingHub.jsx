@@ -432,6 +432,18 @@ const findMatchingCareer = (careerStr) => {
   if (cLower.includes('cyber') || cLower.includes('security') || cLower.includes('hack')) {
     return TARGET_CAREERS.find(c => c.id === 'cybersecurity') || TARGET_CAREERS[0];
   }
+  if (cLower.includes('robot') || cLower.includes('mechatron') || cLower.includes('automat')) {
+    return TARGET_CAREERS.find(c => c.id === 'robotics_automation') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('design') || cLower.includes('ui') || cLower.includes('ux') || cLower.includes('fashion') || cLower.includes('animat')) {
+    return TARGET_CAREERS.find(c => c.id === 'ui_ux_design') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('solar') || cLower.includes('renew') || cLower.includes('green') || cLower.includes('grid')) {
+    return TARGET_CAREERS.find(c => c.id === 'renewable_energy') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('bio') || cLower.includes('pharma') || cLower.includes('device')) {
+    return TARGET_CAREERS.find(c => c.id === 'health_tech') || TARGET_CAREERS[0];
+  }
   return TARGET_CAREERS[0];
 };
 

@@ -363,6 +363,42 @@ def chat_with_ai(req: ChatRequest):
                 "2) Build production-grade cloud microservices, SQL databases, and containerize with Docker.\n"
                 "3) Target software product engineering placements at Zoho, Freshworks, Microsoft, and TCS Digital."
             )
+        elif detected_dom == "aviation":
+            steps_text = (
+                "1) Pass 12th PCM with 50%+ and clear DGCA Class 2 & Class 1 Medical examinations.\n"
+                "2) Clear DGCA Ground School modules (Air Navigation, Aviation Meteorology, Air Regulations, Technical General).\n"
+                "3) Complete 200 hours flying training at a DGCA-approved Flying Club (e.g. Madras Flying Club) to earn your Commercial Pilot License (CPL)."
+            )
+        elif detected_dom == "design":
+            steps_text = (
+                "1) Prepare for design aptitude exams (NIFT CAT/GAT, UCEED, or NID DAT) focusing on sketching, visualization, and creative problem solving.\n"
+                "2) Pursue a Bachelor of Design (B.Des in Fashion, Communication, or UI/UX Design).\n"
+                "3) Build an industry-ready design portfolio in Figma/Adobe CC and complete fashion atelier or digital product design internships."
+            )
+        elif detected_dom == "pharmacy":
+            steps_text = (
+                "1) Complete 12th PCB/PCM and apply through TN Health Paramedical Single Window Counselling for B.Pharm.\n"
+                "2) Complete the 4-year Bachelor of Pharmacy (B.Pharm) or 6-year Pharm.D curriculum accredited by Pharmacy Council of India (PCI).\n"
+                "3) Obtain State Pharmacy Council registration and target formulation R&D, clinical trials, or hospital pharmacotherapy roles."
+            )
+        elif detected_dom == "agriculture":
+            steps_text = (
+                "1) Apply through TNAU Single Window Online Counselling with 12th PCB/PCM marks (aim for 185+ cutoff for main Coimbatore campus).\n"
+                "2) Pursue 4-year B.Sc (Hons) Agriculture or B.Tech Agricultural Engineering covering soil science, precision agronomy, and drone tech.\n"
+                "3) Target Agricultural Officer (AO) roles through TNPSC, ICAR research fellowships, or Agritech leadership positions."
+            )
+        elif detected_dom == "robotics":
+            steps_text = (
+                "1) Master C++, Python, Linear Algebra, and electronics circuit design with STM32 / Arduino microcontrollers.\n"
+                "2) Pursue B.E. Robotics & Automation or Mechatronics at top institutions like PSG Tech or Anna University MIT Campus.\n"
+                "3) Master ROS2 (Robot Operating System), Computer Vision (OpenCV), and industrial PLC automation for smart manufacturing."
+            )
+        elif detected_dom == "psychology":
+            steps_text = (
+                "1) Complete 12th Higher Secondary and enroll in B.Sc Psychology covering developmental and cognitive psychology.\n"
+                "2) Complete M.Sc Applied or Clinical Psychology with hospital clinical postings and diagnostic assessments.\n"
+                "3) Pursue an RCI-recognized M.Phil or Professional Diploma in Clinical Psychology to obtain official license for independent clinical practice."
+            )
         else:
             steps_text = (
                 f"1) Strengthen foundational domain literacy and entry requirements in {career}.\n"

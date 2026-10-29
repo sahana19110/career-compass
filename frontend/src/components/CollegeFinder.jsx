@@ -57,8 +57,12 @@ const CollegeFinder = ({ activeCareer }) => {
       if (cLower.includes('doctor') || cLower.includes('medic')) setSelectedStream('Medical');
       else if (cLower.includes('law') || cLower.includes('advocat')) setSelectedStream('Law');
       else if (cLower.includes('teach') || cLower.includes('educat')) setSelectedStream('Education');
-      else if (cLower.includes('account') || cLower.includes('commerce')) setSelectedStream('Commerce/Arts');
-      else if (cLower.includes('software') || cLower.includes('civil') || cLower.includes('engineer') || cLower.includes('data')) setSelectedStream('Engineering');
+      else if (cLower.includes('account') || cLower.includes('commerce') || cLower.includes('finance')) setSelectedStream('Commerce/Arts');
+      else if (cLower.includes('agri') || cLower.includes('farm')) setSelectedStream('Agriculture');
+      else if (cLower.includes('design') || cLower.includes('fashion') || cLower.includes('ui/ux')) setSelectedStream('Design');
+      else if (cLower.includes('pharma') || cLower.includes('drug')) setSelectedStream('Pharmacy');
+      else if (cLower.includes('pilot') || cLower.includes('aviat')) setSelectedStream('Aviation');
+      else if (cLower.includes('software') || cLower.includes('civil') || cLower.includes('engineer') || cLower.includes('data') || cLower.includes('robot')) setSelectedStream('Engineering');
     }
   }, [activeCareer]);
 
@@ -297,6 +301,10 @@ const CollegeFinder = ({ activeCareer }) => {
               <option value="All">All Streams</option>
               <option value="Engineering">Engineering (B.E / B.Tech)</option>
               <option value="Medical">Medical & Healthcare (M.B.B.S., Allied)</option>
+              <option value="Agriculture">Agriculture & Bio-Systems (TNAU)</option>
+              <option value="Design">Design & Fashion (NIFT)</option>
+              <option value="Pharmacy">Pharmacy & Healthcare (B.Pharm)</option>
+              <option value="Aviation">Aviation & Flight Training (CPL)</option>
               <option value="Law">Law (B.A. LL.B., LL.M.)</option>
               <option value="Education">Education & Teaching (B.Ed)</option>
               <option value="Commerce/Arts">Commerce & Arts (B.Com, BBA)</option>
@@ -388,7 +396,11 @@ const CollegeFinder = ({ activeCareer }) => {
             const isEducation = col.stream_type === 'Education' || col.courses_offered.some(c => c.toLowerCase().includes('b.ed'));
             const isPolytechnic = col.stream_type === 'Polytechnic' || col.type === 'Polytechnic' || col.name.toLowerCase().includes('polytechnic');
             const isArtsScience = col.stream_type === 'Commerce/Arts' || col.name.toLowerCase().includes('arts') || col.name.toLowerCase().includes('loyola') || col.name.toLowerCase().includes('mcc') || col.name.toLowerCase().includes('presidency');
-            const isEngineering = !isMedical && !isLaw && !isEducation && !isPolytechnic && !isArtsScience;
+            const isAgriculture = col.stream_type === 'Agriculture' || col.name.toLowerCase().includes('agricultural') || col.name.toLowerCase().includes('tnau');
+            const isDesign = col.stream_type === 'Design' || col.name.toLowerCase().includes('fashion') || col.name.toLowerCase().includes('nift');
+            const isPharmacy = col.stream_type === 'Pharmacy' || col.name.toLowerCase().includes('pharmacy');
+            const isAviation = col.stream_type === 'Aviation' || col.name.toLowerCase().includes('flying') || col.name.toLowerCase().includes('aviation');
+            const isEngineering = !isMedical && !isLaw && !isEducation && !isPolytechnic && !isArtsScience && !isAgriculture && !isDesign && !isPharmacy && !isAviation;
 
             const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
             const userScore = parseFloat(computedCutoff);
@@ -445,6 +457,26 @@ const CollegeFinder = ({ activeCareer }) => {
                       <span className="text-[10px] px-3 py-1 bg-rose-950/90 text-rose-300 border border-rose-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
                         <CheckCircle2 className="w-3.5 h-3.5 text-rose-400" />
                         <span>NEET-UG Medical Admission (Eligibility: 50%+ in PCB)</span>
+                      </span>
+                    ) : isAgriculture ? (
+                      <span className="text-[10px] px-3 py-1 bg-emerald-950/90 text-emerald-300 border border-emerald-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>ICAR / TNAU Single-Window Agriculture Counselling</span>
+                      </span>
+                    ) : isDesign ? (
+                      <span className="text-[10px] px-3 py-1 bg-pink-950/90 text-pink-300 border border-pink-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-pink-400" />
+                        <span>NIFT National Entrance Examination (CAT & GAT)</span>
+                      </span>
+                    ) : isPharmacy ? (
+                      <span className="text-[10px] px-3 py-1 bg-teal-950/90 text-teal-300 border border-teal-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-teal-400" />
+                        <span>TN Health Paramedical Single-Window Counselling</span>
+                      </span>
+                    ) : isAviation ? (
+                      <span className="text-[10px] px-3 py-1 bg-sky-950/90 text-sky-300 border border-sky-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
+                        <span>DGCA Class 1 & 2 Medical + 12th PCM 50%+</span>
                       </span>
                     ) : isLaw ? (
                       <span className="text-[10px] px-3 py-1 bg-amber-950/90 text-amber-300 border border-amber-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
@@ -544,6 +576,34 @@ const CollegeFinder = ({ activeCareer }) => {
                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">NEET-UG Cutoff Score:</span>
                           <span className="text-xs font-bold text-rose-400">
                             BC: {col.cutoff_marks.NEET_BC || 635} | OC: {col.cutoff_marks.NEET_OC || 655} / 720
+                          </span>
+                        </>
+                      ) : isAgriculture ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">TNAU Merit Cutoff:</span>
+                          <span className="text-xs font-bold text-emerald-400">
+                            BC: {col.cutoff_marks.BC || 186} | OC: {col.cutoff_marks.OC || 191} / 200
+                          </span>
+                        </>
+                      ) : isDesign ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">NIFT National Entrance Merit:</span>
+                          <span className="text-xs font-bold text-pink-400">
+                            Rank: {col.cutoff_marks.NIFT_Rank || '< 1200'} | Score: {col.cutoff_marks.CAT_GAT_Score || '> 65'}
+                          </span>
+                        </>
+                      ) : isPharmacy ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Paramedical Cutoff (TN Health):</span>
+                          <span className="text-xs font-bold text-teal-400">
+                            BC: {col.cutoff_marks.BC || 188.5} | OC: {col.cutoff_marks.OC || 194} / 200
+                          </span>
+                        </>
+                      ) : isAviation ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">DGCA Commercial Pilot Eligibility:</span>
+                          <span className="text-xs font-bold text-sky-400">
+                            Class 1 Medical | Min 12th PCM: {col.cutoff_marks.Min_12th_PCM || '55%'}
                           </span>
                         </>
                       ) : isLaw ? (

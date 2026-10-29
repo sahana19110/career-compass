@@ -5,8 +5,8 @@ from database import get_db
 
 CAREER_DOMAIN_DEFINITIONS = {
     "medicine": {
-        "keywords": ["doctor", "physician", "surgeon", "mbbs", "medical", "medicine", "clinic", "clinical",
-                     "cardiologist", "neurologist", "pediatrician", "dentist", "bds", "radiologist", "hospital", "patient"],
+        "keywords": ["doctor", "physician", "surgeon", "mbbs", "medical", "medicine", "clinical medicine",
+                     "cardiologist", "neurologist", "pediatrician", "dentist", "bds", "radiologist", "general practitioner"],
         "sector": "Healthcare & Medicine",
         "primary_qualification": "Bachelor of Medicine & Surgery (MBBS) Foundation & Clinical Internship",
         "nsqf_level": 8,
@@ -435,28 +435,359 @@ CAREER_DOMAIN_DEFINITIONS = {
             }
         ],
         "guidance": "In Tamil Nadu, commerce colleges such as Loyola College, MCC, and Presidency College have top placement rates with national audit and banking corporations."
+    },
+
+    "aviation": {
+        "keywords": ["pilot", "aviation", "aircraft", "flight", "aerospace", "aeronautical", "commercial pilot", "cpl", "flying", "air hostess", "cabin crew"],
+        "sector": "Aviation & Aerospace Operations",
+        "primary_qualification": "Commercial Pilot License (CPL) & B.Sc Aviation Operations",
+        "nsqf_level": 7,
+        "duration_months": 24,
+        "certifying_body": "Directorate General of Civil Aviation (DGCA) / Ministry of Civil Aviation",
+        "skills": ["Air Navigation", "Aviation Meteorology", "Air Regulations", "Cockpit Resource Management", "Instrument Flying", "Aerodynamics"],
+        "next_job_roles": ["Commercial Airline Pilot", "First Officer", "Flight Instructor", "Aviation Safety Officer"],
+        "roadmap": [
+            {
+                "step": 1,
+                "stage": "1. Eligibility & Medical Clearance",
+                "title": "12th PCM 50%+ & DGCA Class 2 & Class 1 Medical Clearance",
+                "description": "Qualify Higher Secondary with Physics & Mathematics, and clear rigorous DGCA Class 2 and Class 1 medical fitness examinations.",
+                "duration": "3-6 Months",
+                "nsqf_level": 4,
+                "type": "Regulatory Medical Clearance"
+            },
+            {
+                "step": 2,
+                "stage": "2. Ground School Theory Examinations",
+                "title": "DGCA Ground School Module Examinations",
+                "description": "Clear DGCA theoretical written exams in Air Navigation, Aviation Meteorology, Air Regulations, Technical General, and RTR (Aero).",
+                "duration": "6-9 Months",
+                "nsqf_level": 6,
+                "certifying_body": "DGCA India",
+                "type": "Aviation Theory Licensure"
+            },
+            {
+                "step": 3,
+                "stage": "3. Flight Training Simulator & 200 Flying Hours",
+                "title": "Flight Training & Multi-Engine Instrument Rating",
+                "description": "Complete 200 hours of certified flying training including solo flights, night cross-country flights, and multi-engine simulator rating at a DGCA approved flying school.",
+                "duration": "12-15 Months",
+                "nsqf_level": 7,
+                "certifying_body": "DGCA Approved Flying Training Organization (FTO)",
+                "type": "Practical Flight Training"
+            },
+            {
+                "step": 4,
+                "stage": "4. CPL Issuance & Airline Type Rating",
+                "title": "Commercial Pilot License (CPL) & Airline Fleet Type Rating (A320/B737)",
+                "description": "Receive official DGCA CPL license, complete jet aircraft type rating, and join airlines like IndiGo, Air India, or international carriers as First Officer.",
+                "duration": "Career Milestone",
+                "nsqf_level": 8,
+                "certifying_body": "DGCA / Commercial Airlines",
+                "type": "Airline Professional Placement"
+            }
+        ],
+        "guidance": "In India, commercial pilot licensure is administered by the DGCA. Tamil Nadu has historic flight training institutions including the Madras Flying Club."
+    },
+
+    "design": {
+        "keywords": ["fashion", "fashion designer", "textile", "garment", "interior designer", "graphic designer", "ui/ux", "animator", "animation", "product designer", "creative", "apparel"],
+        "sector": "Design, Fashion & Creative Arts",
+        "primary_qualification": "Bachelor of Design (B.Des) & Apparel Tech Certification",
+        "nsqf_level": 6,
+        "duration_months": 48,
+        "certifying_body": "National Institute of Fashion Technology (NIFT) / NCVET",
+        "skills": ["Fashion Illustration", "Pattern Making", "Textile Science", "CLO 3D CAD", "Design Systems", "Garment Manufacturing"],
+        "next_job_roles": ["Fashion Designer", "Apparel Product Developer", "Textile Stylist", "Creative Director"],
+        "roadmap": [
+            {
+                "step": 1,
+                "stage": "1. Creative Aptitude & Foundation",
+                "title": "NIFT / NID Entrance Preparation (CAT & GAT)",
+                "description": "Master visual spatial reasoning, design aesthetics, sketching fundamentals, and material exploration.",
+                "duration": "6-12 Months",
+                "nsqf_level": 4,
+                "type": "Entrance Preparation & Aptitude"
+            },
+            {
+                "step": 2,
+                "stage": "2. Professional Design Degree",
+                "title": "Bachelor of Design (B.Des) in Fashion & Textile Technology",
+                "description": "Comprehensive 4-year degree in textile science, draping, pattern engineering, garment construction, and fashion forecast analytics.",
+                "duration": "48 Months",
+                "nsqf_level": 6,
+                "certifying_body": "NIFT / Recognized University",
+                "type": "Professional Design Degree"
+            },
+            {
+                "step": 3,
+                "stage": "3. 3D Digital Fashion & Portfolio Mastery",
+                "title": "Digital Apparel 3D Prototyping (CLO 3D & Browzwear)",
+                "description": "Build high-end parametric virtual garment models, sustainable fabric simulations, and a signature fashion portfolio.",
+                "duration": "4-6 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Apparel Sector Skill Council (AMHSSC)",
+                "type": "Specialization Micro-credential"
+            },
+            {
+                "step": 4,
+                "stage": "4. Fashion House & Garment Export Apprenticeship",
+                "title": "Industry Apprenticeship in Tamil Nadu Textile Corridor",
+                "description": "Work directly with export apparel houses, luxury designers, or international retail brands in Tiruppur, Coimbatore, and Chennai.",
+                "duration": "6 Months",
+                "nsqf_level": 7,
+                "certifying_body": "Fashion & Garment Export Council",
+                "type": "On-the-Job Training & Placement"
+            }
+        ],
+        "guidance": "Tamil Nadu is India's leading textile and apparel manufacturing hub ('Knitwear Capital' of Tiruppur). NIFT Chennai is one of the premier design campuses in the country."
+    },
+
+    "pharmacy": {
+        "keywords": ["pharmacist", "pharmacy", "b.pharm", "drug", "pharmacology", "formulation", "chemist", "medicinal", "clinical trial"],
+        "sector": "Pharmaceutical & Healthcare Sciences",
+        "primary_qualification": "Bachelor of Pharmacy (B.Pharm) & Drug Regulatory Certification",
+        "nsqf_level": 6,
+        "duration_months": 48,
+        "certifying_body": "Pharmacy Council of India (PCI) / TN MGR Medical University",
+        "skills": ["Pharmaceutics", "Medicinal Chemistry", "Pharmacology", "Quality Control (HPLC)", "Drug Regulatory Affairs", "Clinical Trials"],
+        "next_job_roles": ["Registered Pharmacist", "Quality Control Analyst", "Drug Regulatory Executive", "Clinical Research Associate"],
+        "roadmap": [
+            {
+                "step": 1,
+                "stage": "1. Higher Secondary Science Foundation",
+                "title": "12th Science (PCB / PCM with 50%+)",
+                "description": "Build strong scientific grounding in Organic Chemistry, Biology, and Physical Chemistry for pharmaceutical admission.",
+                "duration": "12 Months",
+                "nsqf_level": 4,
+                "type": "Academic Eligibility"
+            },
+            {
+                "step": 2,
+                "stage": "2. Professional Pharmacy Degree",
+                "title": "Bachelor of Pharmacy (B.Pharm - 4 Years)",
+                "description": "In-depth training in Pharmaceutics, Pharmaceutical Biotechnology, Pharmacokinetics, Medicinal Chemistry, and Hospital Pharmacy.",
+                "duration": "48 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Pharmacy Council of India (PCI)",
+                "type": "Professional Pharmacy Degree"
+            },
+            {
+                "step": 3,
+                "stage": "3. Advanced Formulations & Analytical Instrumentation",
+                "title": "HPLC Analysis, GLP & Industrial Drug Formulation",
+                "description": "Operate high-performance liquid chromatography, spectroscopy, validation protocols, and WHO-GMP compliance.",
+                "duration": "4-6 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Life Sciences Sector Skill Development Council",
+                "type": "Specialization Certification"
+            },
+            {
+                "step": 4,
+                "stage": "4. State Pharmacy Council Registration & Industry Placement",
+                "title": "Tamil Nadu State Pharmacy Council (TNPC) Licensure & Placement",
+                "description": "Obtain registered pharmacist license, work in clinical research, drug discovery, or formulation with top pharma corporations.",
+                "duration": "Career Milestone",
+                "nsqf_level": 7,
+                "certifying_body": "TN State Pharmacy Council",
+                "type": "Professional Licensure & Placement"
+            }
+        ],
+        "guidance": "Tamil Nadu is a major drug formulation and healthcare hub. Premier programs are offered by Madras Medical College (College of Pharmacy) and PSG College of Pharmacy."
+    },
+
+    "agriculture": {
+        "keywords": ["agriculture", "agritech", "farmer", "agronomist", "farming", "horticulture", "soil", "crop", "agricultural engineer", "botany"],
+        "sector": "Agriculture & Bio-Systems",
+        "primary_qualification": "B.Sc (Hons) Agriculture & Smart Agritech Operations",
+        "nsqf_level": 6,
+        "duration_months": 48,
+        "certifying_body": "Indian Council of Agricultural Research (ICAR) / TNAU",
+        "skills": ["Agronomy & Crop Physiology", "Soil Science & Fertility", "Precision Drone Technology", "Organic Pest Management", "Horticulture", "Agri-Business Management"],
+        "next_job_roles": ["Agricultural Officer (AO)", "Agritech Consultant", "Farm Management Specialist", "Research Scientist"],
+        "roadmap": [
+            {
+                "step": 1,
+                "stage": "1. Agricultural Science Eligibility",
+                "title": "12th Science (PCB / PCM) Qualifying Merit",
+                "description": "Achieve strong academic standing in Biology/Mathematics, Physics, and Chemistry for single-window TNAU counseling.",
+                "duration": "12 Months",
+                "nsqf_level": 4,
+                "type": "Higher Secondary Foundation"
+            },
+            {
+                "step": 2,
+                "stage": "2. Professional Agricultural Degree",
+                "title": "B.Sc (Hons) Agriculture (4 Years)",
+                "description": "Comprehensive curriculum in Crop Production, Soil Chemistry, Plant Breeding, Agricultural Economics, Entomology, and Water Management.",
+                "duration": "48 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Tamil Nadu Agricultural University (TNAU) / ICAR",
+                "type": "Agricultural Science Degree"
+            },
+            {
+                "step": 3,
+                "stage": "3. Precision Agritech & Smart Farming",
+                "title": "Agricultural Drone Operations, IoT Sensors & GIS Mapping",
+                "description": "Learn drone crop health surveying, automated drip fertigation, multi-spectral imaging, and climate-resilient farming techniques.",
+                "duration": "4-6 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Agriculture Skill Council of India (ASCI)",
+                "type": "Smart Agritech Certification"
+            },
+            {
+                "step": 4,
+                "stage": "4. Rural Agricultural Work Experience (RAWE) & Placement",
+                "title": "RAWE Field Internship & Government / Corporate Placement",
+                "description": "Complete intensive village stay, hands-on extension teaching with farmers, and secure recruitment with TN Agricultural Dept, NABARD, or agritech leaders.",
+                "duration": "6 Months",
+                "nsqf_level": 7,
+                "certifying_body": "TNAU / Directorate of Agriculture TN",
+                "type": "Field Residency & Placement"
+            }
+        ],
+        "guidance": "Tamil Nadu Agricultural University (TNAU Coimbatore) is one of India's premier agricultural universities. State admissions take place through centralized TNAU counseling."
+    },
+
+    "robotics": {
+        "keywords": ["robotics", "robot", "mechatronics", "automation", "plc", "scada", "ros", "industrial automation", "kinematics"],
+        "sector": "Robotics & Industrial Automation",
+        "primary_qualification": "B.E. Robotics & Industrial Automation Systems",
+        "nsqf_level": 6,
+        "duration_months": 48,
+        "certifying_body": "Capital Goods Skill Council / Anna University",
+        "skills": ["Robot Operating System (ROS)", "PLC & SCADA Programming", "Microcontrollers & STM32", "Computer Vision OpenCV", "Hydraulics & Pneumatics", "Kinematics"],
+        "next_job_roles": ["Robotics Systems Engineer", "Automation Lead", "Mechatronics Specialist", "Embedded Robotics Developer"],
+        "roadmap": [
+            {
+                "step": 1,
+                "stage": "1. Engineering Mathematics & Embedded Logic",
+                "title": "C++ Programming, Electronics & Microcontrollers",
+                "description": "Master algorithmic logic, circuit design, sensor interfacing, and microcontroller programming (Arduino / STM32).",
+                "duration": "3-6 Months",
+                "nsqf_level": 5,
+                "type": "Foundational Qualification"
+            },
+            {
+                "step": 2,
+                "stage": "2. Core Robotics & Mechatronics Degree",
+                "title": "B.E. Robotics & Automation / Mechatronics Engineering",
+                "description": "Study kinematics, dynamic control systems, industrial drives, PLC programming, and mechanical actuators.",
+                "duration": "48 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Anna University / AICTE",
+                "type": "Engineering Degree"
+            },
+            {
+                "step": 3,
+                "stage": "3. Advanced ROS & Vision-Guided Robotics",
+                "title": "Robot Operating System (ROS2) & Computer Vision (OpenCV)",
+                "description": "Build autonomous mobile robots (AMR), simultaneous localization and mapping (SLAM), and AI vision-guided robotic arms.",
+                "duration": "4-6 Months",
+                "nsqf_level": 6,
+                "certifying_body": "Capital Goods Skill Council",
+                "type": "Specialization Certification"
+            },
+            {
+                "step": 4,
+                "stage": "4. Manufacturing OEM Apprenticeship",
+                "title": "Industrial Automation Apprenticeship (Automotive & Electronics)",
+                "description": "Deploy automated assembly lines and robotic pick-and-place systems in Tamil Nadu's industrial hubs (Hyundai, Foxconn, TVS Motor, Schneider).",
+                "duration": "6 Months",
+                "nsqf_level": 7,
+                "certifying_body": "Industrial OEM Partner",
+                "type": "On-the-Job Training & Placement"
+            }
+        ],
+        "guidance": "Tamil Nadu has a premier concentration of automotive and electronics robotics factories in Sriperumbudur and Coimbatore."
+    },
+
+    "psychology": {
+        "keywords": ["psychologist", "counselor", "psychology", "mental health", "clinical psychologist", "therapist", "psychiatry", "cognitive"],
+        "sector": "Psychology & Behavioral Health",
+        "primary_qualification": "B.Sc / M.Sc Clinical Psychology & RCI Licensing",
+        "nsqf_level": 7,
+        "duration_months": 60,
+        "certifying_body": "Rehabilitation Council of India (RCI) / University of Madras",
+        "skills": ["Psychological Assessment", "Cognitive Behavioral Therapy (CBT)", "Counseling Techniques", "Developmental Psychology", "Research Methodology", "Mental Health Triage"],
+        "next_job_roles": ["Clinical Psychologist", "Child & School Counselor", "Corporate Wellness Consultant", "Behavioral Researcher"],
+        "roadmap": [
+            {
+                "step": 1,
+                "stage": "1. Foundational Psychology & Behavioral Sciences",
+                "title": "Higher Secondary Foundation in Psychology / Humanities",
+                "description": "Study human behavior fundamentals, biological bases of behavior, and social perception.",
+                "duration": "12 Months",
+                "nsqf_level": 4,
+                "type": "Foundational Eligibility"
+            },
+            {
+                "step": 2,
+                "stage": "2. Undergraduate Psychology Degree",
+                "title": "B.Sc Psychology (3 Years)",
+                "description": "In-depth study of Cognitive Psychology, Abnormal Psychology, Developmental Milestones, and Experimental Psychological Testing.",
+                "duration": "36 Months",
+                "nsqf_level": 5,
+                "certifying_body": "University of Madras / Central Universities",
+                "type": "Undergraduate Science Degree"
+            },
+            {
+                "step": 3,
+                "stage": "3. Postgraduate Clinical Specialization",
+                "title": "M.Sc Applied / Clinical Psychology",
+                "description": "Master diagnostic psychopathology, psychometric evaluation, clinical interviewing, and evidence-based psychotherapy.",
+                "duration": "24 Months",
+                "nsqf_level": 7,
+                "certifying_body": "UGC Recognized University",
+                "type": "Master of Science Degree"
+            },
+            {
+                "step": 4,
+                "stage": "4. RCI M.Phil & Registered Clinical Licensure",
+                "title": "M.Phil Clinical Psychology (RCI) & Hospital Residency",
+                "description": "Complete 2-year hospital clinical training, obtain RCI registration number, and establish independent clinical practice or hospital consultancy.",
+                "duration": "24 Months",
+                "nsqf_level": 8,
+                "certifying_body": "Rehabilitation Council of India (RCI)",
+                "type": "Professional Licensure"
+            }
+        ],
+        "guidance": "In India, practicing as a licensed Clinical Psychologist requires an RCI-recognized M.Phil or Professional Diploma in Clinical Psychology."
     }
 }
 
 def detect_domain(target_career: str, skills: list) -> str:
-    combined_text = f"{target_career} {' '.join(skills)}".lower()
+    target_clean = target_career.strip().lower()
     
-    # 1. Exact or keyword match
+    # Collect all keywords with their domain, and sort by length descending
+    all_kws = []
     for domain_key, data in CAREER_DOMAIN_DEFINITIONS.items():
         for kw in data["keywords"]:
-            pattern = r'\b' + re.escape(kw) + r'\b'
-            if re.search(pattern, combined_text):
-                return domain_key
+            all_kws.append((kw.lower(), domain_key))
+            
+    all_kws.sort(key=lambda x: len(x[0]), reverse=True)
 
-    # 2. Fuzzy token similarity match
-    tokens = re.sub(r'[^\w\s]', ' ', combined_text).split()
-    for domain_key, data in CAREER_DOMAIN_DEFINITIONS.items():
-        for kw in data["keywords"]:
-            for t in tokens:
-                if len(t) >= 4 and len(kw) >= 4:
-                    ratio = difflib.SequenceMatcher(None, t, kw).ratio()
-                    if ratio >= 0.82:
-                        return domain_key
+    # 1. First priority: Check against target_career directly (whole word regex, longest keyword first)
+    for kw, domain_key in all_kws:
+        pattern = r'\b' + re.escape(kw) + r'\b'
+        if re.search(pattern, target_clean):
+            return domain_key
+
+    # 2. Second priority: Check combined target_career + skills
+    combined_text = f"{target_clean} {' '.join(skills).lower()}"
+    for kw, domain_key in all_kws:
+        pattern = r'\b' + re.escape(kw) + r'\b'
+        if re.search(pattern, combined_text):
+            return domain_key
+
+    # 3. Third priority: Fuzzy token similarity match on target_career
+    tokens = re.sub(r'[^\w\s]', ' ', target_clean).split()
+    for kw, domain_key in all_kws:
+        for t in tokens:
+            if len(t) >= 4 and len(kw) >= 4:
+                ratio = difflib.SequenceMatcher(None, t, kw).ratio()
+                if ratio >= 0.85:
+                    return domain_key
 
     return "custom"
 
@@ -558,24 +889,57 @@ def recommend_pathway(learner_profile: dict):
         # Match relevant courses from the database
         matched_courses = []
         for c in all_courses:
-            score = 70.0
             c_name = c["qualification_name"].lower()
             c_sec = c["sector"].lower()
-
-            # Sector match boost
-            if primary_sector.lower() in c_sec or domain in c_sec or domain in c_name:
-                score += 22.0
             
+            # Direct qualification name match or partial match
+            is_exact_primary = (primary_title.lower() in c_name) or (c_name in primary_title.lower())
+            
+            # Sector or domain match
+            is_sector_match = (primary_sector.lower() in c_sec) or (c_sec in primary_sector.lower()) or (domain in c_sec) or (domain in c_name)
+            
+            # Keyword match from domain keywords
+            kw_matches = sum(1 for kw in domain_info.get("keywords", []) if kw in c_name or kw in c_sec)
+
+            if not (is_exact_primary or is_sector_match or kw_matches > 0):
+                continue # Skip courses that belong to completely unrelated domains!
+
+            score = 75.0
+            if is_exact_primary:
+                score += 20.0
+            elif is_sector_match:
+                score += 15.0
+                
+            score += min(kw_matches * 3.0, 6.0)
+
             # Prior skill overlap bonus
             matched_skills = [s for s in prior_skills if any(s.lower() in ps.lower() for ps in c["skills_covered"])]
-            score += min(len(matched_skills) * 3.0, 7.5)
-            
+            score += min(len(matched_skills) * 2.5, 5.0)
+
             c_copy = dict(c)
             c_copy["match_score"] = min(round(score, 1), 98.5)
             c_copy["matched_prior_skills"] = matched_skills
             matched_courses.append(c_copy)
 
         matched_courses.sort(key=lambda x: x["match_score"], reverse=True)
+
+        # If no database courses matched the domain, synthesize the primary qualification
+        if not matched_courses:
+            matched_courses = [{
+                "id": 999,
+                "nsqf_level": domain_info["nsqf_level"],
+                "qualification_name": domain_info["primary_qualification"],
+                "sector": domain_info["sector"],
+                "target_stream": education,
+                "description": f"Official formal qualification accredited by {domain_info['certifying_body']}.",
+                "skills_covered": domain_info["skills"],
+                "certifying_body": domain_info["certifying_body"],
+                "duration_months": domain_info["duration_months"],
+                "next_job_roles": domain_info["next_job_roles"],
+                "match_score": 96.0,
+                "matched_prior_skills": prior_skills
+            }]
+
         recommended_qualifications = matched_courses[:3]
         stackable_skills = domain_info["skills"]
         

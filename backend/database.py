@@ -196,7 +196,49 @@ def seed_data(cursor):
          "Hands-on program in network defense, ethical hacking, SOC monitoring, SIEM operations, and AWS/Azure cloud security.",
          json.dumps(["Network Security", "Ethical Hacking (CEH)", "SIEM & SOC Operations", "Linux Administration", "Cloud Security", "Firewalls"]),
          "MeitY / NASSCOM FutureSkills", 12,
-         json.dumps(["Security Operations Analyst (SOC)", "Ethical Hacker", "Cyber Defense Engineer", "Cloud Security Associate"]))
+         json.dumps(["Security Operations Analyst (SOC)", "Ethical Hacker", "Cyber Defense Engineer", "Cloud Security Associate"])),
+
+        # Aviation / Pilot
+        (7, "Commercial Pilot License (CPL) & Aviation Operations", "Aviation & Aerospace Operations", "12th_PCM",
+         "Rigorous pilot training covering DGCA ground school modules, air navigation, aviation meteorology, flight simulator ratings, and 200 hours flying time.",
+         json.dumps(["Air Navigation", "Aviation Meteorology", "Air Regulations", "Instrument Flying", "Cockpit Resource Management", "Aerodynamics"]),
+         "Directorate General of Civil Aviation (DGCA) India", 24,
+         json.dumps(["Commercial Airline Pilot", "First Officer", "Flight Instructor", "Aviation Operations Manager"])),
+
+        # Fashion & Design
+        (6, "Bachelor of Design (B.Des) in Fashion & Textile Technology", "Design, Fashion & Creative Arts", "12th_Commerce",
+         "Professional fashion design curriculum covering textile science, pattern engineering, CLO 3D CAD draping, sustainable apparel, and collection development.",
+         json.dumps(["Fashion Illustration", "Pattern Making", "Textile Science", "CLO 3D CAD", "Garment Manufacturing", "Design Systems"]),
+         "NIFT / Apparel Sector Skill Council (AMHSSC)", 48,
+         json.dumps(["Fashion Designer", "Apparel Product Developer", "Textile Stylist", "Creative Director"])),
+
+        # Pharmacy
+        (6, "Bachelor of Pharmacy (B.Pharm) & Pharmaceutical Formulations", "Pharmaceutical & Healthcare Sciences", "12th_PCB",
+         "Comprehensive pharmaceutical sciences training in drug formulations, medicinal chemistry, clinical trials, HPLC instrumentation, and WHO-GMP compliance.",
+         json.dumps(["Pharmaceutics", "Medicinal Chemistry", "Pharmacology", "Quality Control (HPLC)", "Drug Regulatory Affairs", "Clinical Trials"]),
+         "Pharmacy Council of India (PCI) / TN MGR Medical University", 48,
+         json.dumps(["Registered Pharmacist", "Quality Control Analyst", "Drug Regulatory Executive", "Clinical Research Associate"])),
+
+        # Agriculture
+        (6, "B.Sc (Hons) Agriculture & Precision Smart Farming", "Agriculture & Bio-Systems", "12th_PCB",
+         "Modern agricultural science covering crop physiology, soil fertility, precision drone spraying, organic pest control, and agri-business management.",
+         json.dumps(["Agronomy & Crop Physiology", "Soil Science & Fertility", "Precision Drone Technology", "Organic Pest Management", "Horticulture", "Agri-Business"]),
+         "Indian Council of Agricultural Research (ICAR) / TNAU", 48,
+         json.dumps(["Agricultural Officer (AO)", "Agritech Consultant", "Farm Management Specialist", "Research Scientist"])),
+
+        # Robotics
+        (6, "B.E. Robotics & Industrial Automation Systems", "Robotics & Industrial Automation", "12th_PCM",
+         "Hands-on mechatronics and robotics engineering covering ROS2, PLC/SCADA, computer vision, kinematics, and industrial manufacturing assembly.",
+         json.dumps(["Robot Operating System (ROS)", "PLC & SCADA", "Microcontrollers & STM32", "Computer Vision OpenCV", "Hydraulics & Pneumatics", "Kinematics"]),
+         "Capital Goods Skill Council / Anna University", 48,
+         json.dumps(["Robotics Systems Engineer", "Automation Lead", "Mechatronics Specialist", "Embedded Robotics Developer"])),
+
+        # Psychology
+        (7, "B.Sc & M.Sc Clinical Psychology & Behavioral Health Sciences", "Psychology & Behavioral Health", "12th_Commerce",
+         "Curriculum covering cognitive psychology, diagnostic psychopathology, psychometric evaluation, counseling techniques, and hospital clinical postings.",
+         json.dumps(["Psychological Assessment", "Cognitive Behavioral Therapy (CBT)", "Counseling Techniques", "Developmental Psychology", "Research Methodology"]),
+         "Rehabilitation Council of India (RCI) / University of Madras", 60,
+         json.dumps(["Clinical Psychologist", "Child & School Counselor", "Corporate Wellness Consultant", "Behavioral Researcher"]))
     ]
 
     cursor.executemany("""
@@ -281,6 +323,34 @@ def seed_data(cursor):
          json.dumps({"OC": 93.0, "BC": 88.5, "MBC": 84.0, "SC/ST": 76.0}), "₹1,850 / year", "https://presidencycollegechennai.ac.in",
          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Presidency_College_Madras.jpg/960px-Presidency_College_Madras.jpg", "Photo: Wikimedia Commons",
          4.8, "NIRF #3 (Arts & Science)", "Govt College Placements & TNPSC Leadership", "NAAC A+ | Heritage College"),
+
+        # --- AGRICULTURE & ALLIED SCIENCES ---
+        ("Tamil Nadu Agricultural University (TNAU)", "Coimbatore", "Lawley Road, Coimbatore", "Tamil Nadu", "Government Autonomous", "Agriculture", 1,
+         json.dumps(["B.Sc (Hons) Agriculture", "B.Tech Agricultural Engineering", "B.Sc (Hons) Horticulture", "B.Tech Biotechnology"]),
+         json.dumps({"OC": 191.0, "BC": 186.0, "MBC": 180.0, "SC/ST": 162.0}), "₹45,000 / year", "https://tnau.ac.in",
+         None, None,
+         4.8, "NIRF #5 (Agriculture & Allied)", "Avg ₹5.8 LPA | AO & Agri-Corporates Placements", "ICAR Accredited | Premier State Agricultural University"),
+
+        # --- DESIGN & FASHION ---
+        ("National Institute of Fashion Technology (NIFT Chennai)", "Chennai", "Taramani, Chennai", "Tamil Nadu", "Institute of National Importance", "Design", 1,
+         json.dumps(["B.Des Fashion Design", "B.Des Textile Design", "B.Des Fashion Communication", "B.F.Tech Apparel Production"]),
+         json.dumps({"NIFT_Rank": "< 1200", "CAT/GAT Score": "> 65"}), "₹3,20,000 / year", "https://nift.ac.in/chennai",
+         None, None,
+         4.8, "NIRF #7 (Fashion Design)", "Avg ₹7.5 LPA | 92% Placed in Top Fashion Houses", "Statutory Institute under Ministry of Textiles"),
+
+        # --- PHARMACY & PHARMACEUTICAL SCIENCES ---
+        ("Madras Medical College (College of Pharmacy)", "Chennai", "Park Town, Chennai", "Tamil Nadu", "Government Autonomous", "Pharmacy", 1,
+         json.dumps(["Bachelor of Pharmacy (B.Pharm)", "Pharm.D (Doctor of Pharmacy)", "M.Pharm Pharmacology", "M.Pharm Pharmaceutics"]),
+         json.dumps({"OC": 194.0, "BC": 188.5, "MBC": 181.0, "SC/ST": 160.0}), "₹15,000 / year", "https://mmc.ac.in",
+         "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Mmc-new.jpg/960px-Mmc-new.jpg", "Photo: Wikimedia Commons",
+         4.9, "State Premier Pharmacy College", "Avg ₹6.0 LPA | Top Pharma R&D & Hospital Clinical Postings", "PCI Approved | TN MGR Medical University"),
+
+        # --- AVIATION & FLIGHT TRAINING ---
+        ("Madras Flying Club & Aviation Academy", "Chennai", "Civil Aerodrome, Meenambakkam, Chennai", "Tamil Nadu", "Autonomous DGCA Center", "Aviation", 1,
+         json.dumps(["Commercial Pilot License (CPL Ground & Flying)", "B.Sc Aviation", "Aircraft Maintenance Engineering (AME)"]),
+         json.dumps({"DGCA_Medical": "Class 1", "Min_12th_PCM": "55%"}), "₹2,80,000 / year", "https://madrasflyingclub.org",
+         None, None,
+         4.7, "Premier DGCA Flying School (Est. 1930)", "100% DGCA Flight Hours | Airline Placement Track", "DGCA Approved Training Organization (ATO)"),
 
         # --- POLYTECHNIC DIPLOMA COLLEGES ---
         ("Central Polytechnic College", "Chennai", "Taramani, Chennai", "Tamil Nadu", "Polytechnic", "Polytechnic", 1,
