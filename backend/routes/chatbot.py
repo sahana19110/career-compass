@@ -18,7 +18,8 @@ class ChatRequest(BaseModel):
 
 GREETING_WORDS = [
     "hi", "hy", "hey", "hai", "hello", "helo", "hlo", 
-    "vanakkam", "good morning", "good afternoon", "good evening"
+    "vanakkam", "good morning", "good afternoon", "good evening",
+    "yo", "sup", "wassup", "what's up", "whats up", "namaste", "namaskaram"
 ]
 
 def collapse_repeated_chars(text: str) -> str:
@@ -31,6 +32,81 @@ def normalize_text(text: str) -> str:
     return " ".join(collapsed_words)
 
 NORMALIZED_GREETINGS = [normalize_text(g) for g in GREETING_WORDS]
+
+def is_how_are_you(msg: str) -> bool:
+    clean = re.sub(r'[^\w\s]', '', msg.lower()).strip()
+    patterns = [
+        r'\bhow\s*(?:are|r)\s*(?:you|u)\b',
+        r'\bhow\s*(?:are|r)\s*(?:you|u)\s*doing\b',
+        r'\bhow\s*do\s*you\s*do\b',
+        r'\bhows\s*it\s*going\b',
+        r'\bhow\s*is\s*it\s*going\b',
+        r'\bhw\s*r\s*u\b',
+        r'\bhow\s*r\s*u\b',
+        r'\bhow\s*u\s*doing\b',
+        r'\bwhats\s*up\b',
+        r'\bwhat\s*is\s*up\b',
+        r'\bwassup\b',
+        r'\bsup\b',
+        r'\bhow\s*are\s*things\b'
+    ]
+    return any(re.search(p, clean) for p in patterns)
+
+def is_identity_question(msg: str) -> bool:
+    clean = re.sub(r'[^\w\s]', '', msg.lower()).strip()
+    patterns = [
+        r'\bwho\s*(?:are|r)\s*(?:you|u)\b',
+        r'\bwhat\s*(?:is|s)\s*your\s*name\b',
+        r'\bwhats\s*your\s*name\b',
+        r'\btell\s*me\s*about\s*yourself\b',
+        r'\bwhat\s*are\s*you\b',
+        r'\bwho\s*made\s*you\b',
+        r'\bwho\s*created\s*you\b',
+        r'\bwho\s*developed\s*you\b'
+    ]
+    return any(re.search(p, clean) for p in patterns)
+
+def is_gratitude(msg: str) -> bool:
+    clean = re.sub(r'[^\w\s]', '', msg.lower()).strip()
+    words = clean.split()
+    if len(words) <= 5:
+        patterns = [
+            r'\bthank\s*(?:you|u)\b',
+            r'\bthanks\b',
+            r'\bthx\b',
+            r'\btq\b',
+            r'\bnandri\b',
+            r'\bappreciate\s*it\b'
+        ]
+        return any(re.search(p, clean) for p in patterns)
+    return False
+
+def is_farewell(msg: str) -> bool:
+    clean = re.sub(r'[^\w\s]', '', msg.lower()).strip()
+    words = clean.split()
+    if len(words) <= 3:
+        patterns = [
+            r'\bbye\b',
+            r'\bgoodbye\b',
+            r'\bsee\s*you\b',
+            r'\bcya\b',
+            r'\btata\b',
+            r'\bhave\s*a\s*good\s*day\b',
+            r'\bgood\s*night\b'
+        ]
+        return any(re.search(p, clean) for p in patterns)
+    return False
+
+def is_help_or_capabilities(msg: str) -> bool:
+    clean = re.sub(r'[^\w\s]', '', msg.lower()).strip()
+    patterns = [
+        r'\bwhat\s*can\s*you\s*do\b',
+        r'\bhow\s*can\s*you\s*help\b',
+        r'\bwhat\s*do\s*you\s*do\b',
+        r'\bhelp\b',
+        r'\bwhat\s*are\s*your\s*features\b'
+    ]
+    return any(re.search(p, clean) for p in patterns)
 
 def is_greeting(msg: str) -> bool:
     words_orig = re.sub(r'[^\w\s]', '', msg).strip().split()
@@ -424,8 +500,67 @@ def chat_with_ai(req: ChatRequest):
             ]
         }
 
+    # Natural Conversation Responses (checked BEFORE generic greeting)
+    if is_how_are_you(msg):
+        greeting_name = f", {req.user_name}" if req.user_name else ""
+        response_text = (
+            f"I'm doing great{greeting_name}! Ready to help you navigate your career and education journey. 😊\n\n"
+            f"Ask me about TNEA/NEET cutoffs, career options after 10th or 12th, scholarships, or type your target career and I'll build a roadmap for you!"
+        )
+        return {
+            "reply": response_text,
+            "suggested_actions": ["Calculate TNEA Cutoff", "Options after 12th", "Which course is best for me?", "View Scholarships"]
+        }
+
+    elif is_identity_question(msg):
+        response_text = (
+            "I am **Ascentia AI** — your Smart Skilling Navigator! 🎓\n\n"
+            "I was built by **Sahana Balaji** to help students in Tamil Nadu discover the right career path, understand TNEA/NEET cutoffs, find colleges, and build personalized NSQF qualification roadmaps.\n\n"
+            "Type any career goal (Doctor, Pilot, Designer, Chef, anything!) and I'll generate a tailored pathway for it!"
+        )
+        return {
+            "reply": response_text,
+            "suggested_actions": ["Which course is best for me?", "Calculate TNEA Cutoff", "View Colleges"]
+        }
+
+    elif is_gratitude(msg):
+        response_text = (
+            f"You're welcome{', ' + req.user_name if req.user_name else ''}! Happy to help. 😊\n\n"
+            "Feel free to ask me anything about careers, cutoffs, colleges, or scholarships!"
+        )
+        return {
+            "reply": response_text,
+            "suggested_actions": ["Which course is best for me?", "Calculate TNEA Cutoff", "View Scholarships"]
+        }
+
+    elif is_farewell(msg):
+        response_text = (
+            f"Goodbye{', ' + req.user_name if req.user_name else ''}! Best of luck with your career journey. 🌟\n\n"
+            "Come back anytime you need guidance on cutoffs, colleges, or career pathways!"
+        )
+        return {
+            "reply": response_text,
+            "suggested_actions": ["Which course is best for me?", "View Colleges"]
+        }
+
+    elif is_help_or_capabilities(msg):
+        response_text = (
+            "Here's what I can help you with:\n\n"
+            "• 🧮 **TNEA & NEET Cutoff Calculator** — Enter your Maths, Physics, Chemistry marks\n"
+            "• 🎯 **Personalized Career Roadmap** — Type any career (Doctor, Pilot, Designer, Chef...)\n"
+            "• 🎓 **Options after 10th & 12th** — Engineering, Medicine, Law, Commerce, Arts\n"
+            "• 🏛️ **College Finder** — Filter Tamil Nadu colleges by stream, district, cutoff\n"
+            "• 💰 **Scholarships & Grants** — Pudhumai Penn, First Graduate, 7.5% Quota, BC/MBC\n"
+            "• 📜 **NSQF Skill Levels 1–10** — Vocational qualification pathways\n"
+            "• 📈 **Job & Salary Trends** — Hiring demand across AI, Medical, Civil, Law sectors"
+        )
+        return {
+            "reply": response_text,
+            "suggested_actions": ["Calculate TNEA Cutoff", "Which course is best for me?", "View Scholarships", "Options after 12th"]
+        }
+
     # Greeting Matching (1-3 words, typo tolerant)
-    if is_greeting(msg):
+    elif is_greeting(msg):
         greeting_name = f", {req.user_name}" if req.user_name else ""
         response_text = (
             f"Hello{greeting_name}! I am Ascentia AI, your Career & Education Navigator.\n\n"
