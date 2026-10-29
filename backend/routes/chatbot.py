@@ -7,60 +7,55 @@ import os
 import logging
 from ai_engine import detect_domain
 
-# ─── Gemini AI Setup ───────────────────────────────────────────────────────────
-_gemini_model = None
+# ─── Groq AI Setup (FREE, no payment needed) ──────────────────────────────────
+_groq_client = None
 
-def _get_gemini_model():
-    """Lazy-load Gemini model — only once, only if API key is available."""
-    global _gemini_model
-    if _gemini_model is not None:
-        return _gemini_model
-    api_key = os.environ.get("GEMINI_API_KEY", "").strip()
+ASCENTIA_SYSTEM_PROMPT = (
+    "You are Ascentia AI — a friendly, expert Career & Education Guidance chatbot "
+    "built specifically for students in Tamil Nadu, India. You were created by Sahana Balaji.\n\n"
+    "Your primary focus areas:\n"
+    "• Career guidance for ANY career (Doctor, Engineer, Lawyer, Pilot, Chef, Designer, Teacher, Farmer, etc.)\n"
+    "• Tamil Nadu education system: TNEA, NEET, TN board, TANCET, TNPSC\n"
+    "• Colleges in Tamil Nadu: Anna University affiliates, medical colleges, arts & science, law schools\n"
+    "• Scholarships: Pudhumai Penn, BC/MBC/SC/ST schemes, NSP, First Graduate, 7.5% quota\n"
+    "• NSQF skill levels 1–10 and vocational training\n"
+    "• Skill roadmaps, upskilling, free online resources\n"
+    "• Job market, salary ranges in India, career progression\n\n"
+    "Rules:\n"
+    "1. ALWAYS respond helpfully to ANY message — greetings, casual chat, career questions, anything.\n"
+    "2. If the message is casual (greetings, jokes, small talk) — respond warmly and briefly, then gently steer back to career/education.\n"
+    "3. If the message is about a career — give a concise, accurate, actionable answer.\n"
+    "4. Never invent specific cutoff scores, college rankings, or scholarship deadlines. If unsure, say so clearly.\n"
+    "5. Use simple English (or Tamil/Hindi if the user writes in that language).\n"
+    "6. Keep responses under 250 words. Use bullet points and emojis for clarity.\n"
+    "7. End with a helpful follow-up question or suggestion when relevant.\n"
+    "8. NEVER say 'I am a large language model' or mention Groq, Meta, Llama, or any AI company — you are Ascentia AI, created by Sahana Balaji.\n"
+    "9. Format responses with line breaks for readability. Use • for bullet points."
+)
+
+def _get_groq_client():
+    """Lazy-load Groq client — only once, only if API key is available."""
+    global _groq_client
+    if _groq_client is not None:
+        return _groq_client
+    api_key = os.environ.get("GROQ_API_KEY", "").strip()
     if not api_key:
         return None
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
-        _gemini_model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
-            generation_config={
-                "temperature": 0.7,
-                "max_output_tokens": 600,
-            },
-            system_instruction=(
-                "You are Ascentia AI — a friendly, expert Career & Education Guidance chatbot "
-                "built specifically for students in Tamil Nadu, India. You were created by Sahana Balaji.\n\n"
-                "Your primary focus areas:\n"
-                "• Career guidance for ANY career (Doctor, Engineer, Lawyer, Pilot, Chef, Designer, Teacher, Farmer, etc.)\n"
-                "• Tamil Nadu education system: TNEA, NEET, TN board, TANCET, TNPSC\n"
-                "• Colleges in Tamil Nadu: Anna University affiliates, medical colleges, arts & science, law schools\n"
-                "• Scholarships: Pudhumai Penn, BC/MBC/SC/ST schemes, NSP, First Graduate, 7.5% quota\n"
-                "• NSQF skill levels 1–10 and vocational training\n"
-                "• Skill roadmaps, upskilling, free online resources\n"
-                "• Job market, salary ranges in India, career progression\n\n"
-                "Rules:\n"
-                "1. ALWAYS respond helpfully to ANY message — never say you cannot help.\n"
-                "2. If the message is casual (greetings, jokes, small talk) — respond warmly and briefly, then gently steer back to career/education.\n"
-                "3. If the message is about a career — give a concise, accurate, actionable answer.\n"
-                "4. Never invent specific cutoff scores, college rankings, or scholarship deadlines. If unsure, say so clearly.\n"
-                "5. Use simple English (or Tamil/Hindi if the user writes in that language).\n"
-                "6. Keep responses under 250 words. Use bullet points for clarity.\n"
-                "7. End with a helpful follow-up question or suggestion when relevant.\n"
-                "8. NEVER say 'I am a large language model' or mention Google or Gemini — you are Ascentia AI."
-            )
-        )
-        logging.info("Gemini model loaded successfully.")
-        return _gemini_model
+        from groq import Groq
+        _groq_client = Groq(api_key=api_key)
+        logging.info("Groq client loaded successfully.")
+        return _groq_client
     except Exception as e:
-        logging.warning(f"Gemini model init failed: {e}")
+        logging.warning(f"Groq client init failed: {e}")
         return None
 
 
-def call_gemini(user_message: str, user_name: str = None, education: str = None,
-                target_career: str = None, history: list = None) -> str:
-    """Call Gemini API with user context. Returns response text or None on failure."""
-    model = _get_gemini_model()
-    if model is None:
+def call_ai(user_message: str, user_name: str = None, education: str = None,
+            target_career: str = None, history: list = None) -> str:
+    """Call Groq API (Llama 3.3 70B) with user context. Returns response text or None on failure."""
+    client = _get_groq_client()
+    if client is None:
         return None
     try:
         context_parts = []
@@ -70,32 +65,34 @@ def call_gemini(user_message: str, user_name: str = None, education: str = None,
             context_parts.append(f"Current education: {education}")
         if target_career:
             context_parts.append(f"Target career: {target_career}")
-        
-        context_prefix = ""
+
+        system_msg = ASCENTIA_SYSTEM_PROMPT
         if context_parts:
-            context_prefix = "[Student context: " + ", ".join(context_parts) + "]\n\n"
-        
-        # Build conversation history for multi-turn
-        chat_history = []
+            system_msg += "\n\n[Student context: " + ", ".join(context_parts) + "]"
+
+        messages = [{"role": "system", "content": system_msg}]
+
         if history:
-            for turn in history[-6:]:  # Last 6 turns for context
+            for turn in history[-6:]:
                 role = turn.get("role", "user")
                 content = turn.get("content", "")
                 if content:
-                    chat_history.append({
-                        "role": "user" if role == "user" else "model",
-                        "parts": [content]
+                    messages.append({
+                        "role": "user" if role == "user" else "assistant",
+                        "content": content
                     })
-        
-        if chat_history:
-            chat = model.start_chat(history=chat_history)
-            response = chat.send_message(context_prefix + user_message)
-        else:
-            response = model.generate_content(context_prefix + user_message)
-        
-        return response.text.strip()
+
+        messages.append({"role": "user", "content": user_message})
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=600,
+        )
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        logging.warning(f"Gemini call failed: {e}")
+        logging.warning(f"Groq AI call failed: {e}")
         return None
 
 router = APIRouter(prefix="/api/chat", tags=["AI Chatbot"])
@@ -449,15 +446,15 @@ def chat_with_ai(req: ChatRequest):
         elif "nsqf" in msg_lower or "திறன்" in msg_lower:
             response_text = TAMIL_RESPONSES["nsqf"]
         else:
-            # Use Gemini for any Tamil message not matched by keywords
-            gemini_reply = call_gemini(
+            # Use Groq AI for any Tamil message not matched by keywords
+            ai_reply = call_ai(
                 user_message=msg,
                 user_name=req.user_name,
                 education=req.education,
                 target_career=req.target_career,
                 history=req.history or []
             )
-            response_text = gemini_reply if gemini_reply else (
+            response_text = ai_reply if ai_reply else (
                 "வணக்கம்! நான் உங்களுக்கு கல்வி மற்றும் தொழில் வழிகாட்டுதல் வழங்க தயாராக இருக்கிறேன். 😊\n\n"
                 "உங்கள் கேள்வியை கொஞ்சம் மேலும் விவரமாக கேட்கலாமா?"
             )
@@ -681,17 +678,17 @@ def chat_with_ai(req: ChatRequest):
             "and escalating to NSQF Level 6 (Advanced AI/ML & PyTorch). Average starting salary ranges from ₹4.5L to ₹7.5L PA."
         )
     else:
-        # ── Gemini AI Fallback: handles ANY message intelligently ──────────────
-        gemini_reply = call_gemini(
+        # ── Groq AI Fallback: handles ANY message intelligently ──────────────
+        ai_reply = call_ai(
             user_message=msg,
             user_name=req.user_name,
             education=req.education,
             target_career=req.target_career,
             history=req.history or []
         )
-        if gemini_reply:
+        if ai_reply:
             return {
-                "reply": gemini_reply,
+                "reply": ai_reply,
                 "suggested_actions": [
                     "Calculate TNEA Cutoff",
                     "Which course is best for me?",
@@ -699,7 +696,7 @@ def chat_with_ai(req: ChatRequest):
                     "Options after 12th"
                 ]
             }
-        # Final static fallback (only if Gemini is not configured or fails)
+        # Final static fallback (only if Groq AI is not configured or fails)
         response_text = (
             "I'm here to help! 😊 You can ask me about:\n\n"
             "• 🎯 Any career path — Doctor, Engineer, Pilot, Chef, Designer, Lawyer...\n"
