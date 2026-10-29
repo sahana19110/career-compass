@@ -433,6 +433,25 @@ def chat_with_ai(req: ChatRequest):
 
     # Tamil Language Response Engine
     if lang == "ta":
+        # Try Groq AI first for any Tamil message
+        ai_reply = call_ai(
+            user_message=msg,
+            user_name=req.user_name,
+            education=req.education,
+            target_career=req.target_career,
+            history=req.history or []
+        )
+        if ai_reply:
+            return {
+                "reply": ai_reply,
+                "suggested_actions": [
+                    "10/12த் பற்றிய சந்தேகங்கள்",
+                    "TNEA கட் ஆஃப் விபரம்",
+                    "உதவித்தொகை திட்டங்கள்",
+                    "வேலைவாய்ப்பு தகவல்கள்"
+                ]
+            }
+        # Static Tamil fallback if Groq is unavailable
         if "10" in msg_lower or "பத்தாம்" in msg_lower:
             response_text = TAMIL_RESPONSES["10th"]
         elif "12" in msg_lower or "பன்னிரண்டாம்" in msg_lower:
@@ -660,7 +679,32 @@ def chat_with_ai(req: ChatRequest):
             f"Hello{greeting_name}! I am Ascentia AI, your Career & Education Navigator.\n\n"
             f"Ask me about cutoffs, career options after 10th/12th, NSQF skill levels, or scholarships!"
         )
-    elif contains_whole_word(msg_lower, "cutoff") or contains_whole_word(msg_lower, "cutoffs") or contains_whole_word(msg_lower, "tnea") or contains_whole_word(msg_lower, "mark") or contains_whole_word(msg_lower, "marks"):
+        return {
+            "reply": response_text,
+            "suggested_actions": ["Calculate TNEA Cutoff", "Options after 12th", "View Scholarships", "Which course is best for me?"]
+        }
+
+    # ── Groq AI: Try intelligent response FIRST for ALL messages ──────────────
+    ai_reply = call_ai(
+        user_message=msg,
+        user_name=req.user_name,
+        education=req.education,
+        target_career=req.target_career,
+        history=req.history or []
+    )
+    if ai_reply:
+        return {
+            "reply": ai_reply,
+            "suggested_actions": [
+                "Calculate TNEA Cutoff",
+                "Which course is best for me?",
+                "View Scholarships",
+                "Options after 12th"
+            ]
+        }
+
+    # ── Static keyword fallback (only if Groq AI is unavailable) ──────────────
+    if contains_whole_word(msg_lower, "cutoff") or contains_whole_word(msg_lower, "cutoffs") or contains_whole_word(msg_lower, "tnea") or contains_whole_word(msg_lower, "mark") or contains_whole_word(msg_lower, "marks"):
         response_text = KNOWLEDGE_BASE["cutoff"]
     elif contains_whole_word(msg_lower, "10th") or contains_whole_word(msg_lower, "10"):
         response_text = KNOWLEDGE_BASE["10th"]
@@ -678,25 +722,6 @@ def chat_with_ai(req: ChatRequest):
             "and escalating to NSQF Level 6 (Advanced AI/ML & PyTorch). Average starting salary ranges from ₹4.5L to ₹7.5L PA."
         )
     else:
-        # ── Groq AI Fallback: handles ANY message intelligently ──────────────
-        ai_reply = call_ai(
-            user_message=msg,
-            user_name=req.user_name,
-            education=req.education,
-            target_career=req.target_career,
-            history=req.history or []
-        )
-        if ai_reply:
-            return {
-                "reply": ai_reply,
-                "suggested_actions": [
-                    "Calculate TNEA Cutoff",
-                    "Which course is best for me?",
-                    "View Scholarships",
-                    "Options after 12th"
-                ]
-            }
-        # Final static fallback (only if Groq AI is not configured or fails)
         response_text = (
             "I'm here to help! 😊 You can ask me about:\n\n"
             "• 🎯 Any career path — Doctor, Engineer, Pilot, Chef, Designer, Lawyer...\n"
