@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict
 import re
 import difflib
+from ai_engine import detect_domain
 
 router = APIRouter(prefix="/api/chat", tags=["AI Chatbot"])
 
@@ -95,53 +96,94 @@ def extract_and_calculate_cutoff(msg: str):
 
 KNOWLEDGE_BASE = {
     "10th": (
-        "After 10th grade, you can choose:\n"
+        "After 10th grade, you can choose:\n\n"
         "• Higher Secondary (11th/12th PCM, PCB, Commerce, Arts)\n"
         "• 3-Year Polytechnic Diploma (Computer, ECE, Mech, Civil)\n"
-        "• NSQF Level 3 & 4 Skill Certifications (Junior Software Dev, Web Basics)."
+        "• NSQF Level 3 & 4 Vocational Skill Certifications."
     ),
     "12th": (
-        "After 12th grade:\n"
-        "• PCM students: B.E./B.Tech (CS, AI/ML, ECE), B.Sc Data Science, or NSQF Level 5 Full-Stack pathways.\n"
-        "• PCB students: Medicine, Biotech, Healthcare Analytics, or Nursing.\n"
-        "• Commerce: B.Com, BBA, CA, or Digital Marketing."
+        "After 12th grade options across streams:\n\n"
+        "• 🧬 PCB / Biology: MBBS (via NEET-UG), BDS, Pharmacy, Allied Health Sciences, Nursing\n"
+        "• ⚡ PCM / Maths: B.E./B.Tech (CSE, AI/ML, Civil, ECE) via TNEA, or B.Sc Data Science\n"
+        "• ⚖️ Commerce / Arts: 5-Year Integrated B.A./B.B.A. LL.B. Law, B.Com, BBA, Chartered Accountancy (CA)\n"
+        "• 🎓 Vocational / Skilling: NSQF Level 5-6 Advanced Industry Certifications."
     ),
     "cutoff": (
-        "Tamil Nadu (TNEA) cutoffs are calculated out of 200 (Maths 100 + Physics 50 + Chemistry 50).\n"
-        "Top colleges like CEG, MIT, PSG require 190+ cutoffs for CS/AI branches.\n\n"
-        "*(Note: TNEA cutoffs are approximate, change every year, and vary by community category).*"
+        "Tamil Nadu (TNEA) cutoffs are calculated out of 200 (Maths 100 + Physics 50 + Chemistry 50).\n\n"
+        "• Top colleges like CEG, MIT, PSG require 190+ cutoffs for CS/AI branches.\n"
+        "• Medical admissions (MBBS/BDS) are based exclusively on NEET-UG scores (out of 720), where top TN Govt medical colleges require 630+.\n\n"
+        "*(Note: Cutoffs are approximate, change every year based on merit, and vary by community category).*"
     ),
     "nsqf": (
-        "NSQF (National Skills Qualifications Framework) organizes qualifications from Level 1 to Level 10:\n"
+        "NSQF (National Skills Qualifications Framework) organizes qualifications from Level 1 to Level 10:\n\n"
         "• Level 3-4: Foundational Certificates (10th pass)\n"
         "• Level 5-6: Advanced Industry Diplomas & Specialist Certifications\n"
-        "• Level 7-10: Postgraduate & Master Industry Credentials\n\n"
-        "It enables stackable micro-credentials and seamless credit transfers."
+        "• Level 7-10: Professional Degrees, Master Credentials & Applied Research\n\n"
+        "It provides stackable micro-credentials and seamless credit transfer across institutions."
     ),
     "scholarship": (
         "Key scholarships available in Tamil Nadu:\n\n"
         "• 🌸 Pudhumai Penn Scheme (₹1,000/month for TN Govt school girls)\n"
-        "• 🎓 TN First Graduate Scholarship (Full tuition fee waiver)\n"
+        "• 👦 Tamizh Pudhalvan Scheme (₹1,000/month for TN Govt school boys)\n"
+        "• 🎓 TN First Graduate Scholarship (Full tuition fee waiver for first degree in family)\n"
+        "• 🏥 TN 7.5% Special Quota Financial Assistance (100% fees for Govt school students in Medical/Engg)\n"
         "• 👩‍💻 AICTE Pragati Scholarship for Girls (₹50,000/year)\n"
-        "• 📜 Post-Matric SC/ST Scholarship (Full tuition & maintenance fee coverage)\n"
-        "• 🏛️ Central Sector Scheme of Scholarships for College Students"
+        "• 📜 Post-Matric SC/ST/SCC Scholarship (Full tuition & maintenance allowance)\n"
+        "• 🏛️ BC / MBC / DNC Post-Matric Scholarship (Full tuition reimbursement)"
     ),
     "job": (
-        "Top high-demand domains right now:\n"
-        "• Artificial Intelligence & ML (+34% growth)\n"
-        "• Full-Stack Web & Cloud Development (+28%)\n"
-        "• Cyber Security (+30%)\n"
-        "• EV Powertrain & Green Energy (+42%)."
+        "Top high-demand career domains right now:\n\n"
+        "• 🩺 Clinical Medicine & Healthcare (+24% growth, high stability)\n"
+        "• 🤖 Artificial Intelligence & Machine Learning (+34% YoY)\n"
+        "• 💻 Full-Stack Web & Cloud Development (+28%)\n"
+        "• 📊 Data Science & Big Data Analytics (+32%)\n"
+        "• ⚡ EV Powertrain & Green Energy (+42%)\n"
+        "• 🏗️ Civil Infrastructure & BIM Smart Cities (+22%)\n"
+        "• ⚖️ Corporate Law & Regulatory Compliance (+20%)."
     )
 }
 
 TAMIL_RESPONSES = {
-    "10th": "10-ஆம் வகுப்பிற்குப் பிறகு நீங்கள் 11/12-ஆம் வகுப்பு, 3 ஆண்டு பாலிடெக்னிக் டிப்ளமோ அல்லது NSQF தொழில் நுட்ப பயிற்சி சான்றிதழ் படிப்புகளைத் தேர்ந்தெடுக்கலாம்.",
-    "12th": "12-ஆம் வகுப்பிற்குப் பிறகு B.E/B.Tech (CS, AI/ML), B.Sc டேட்டா சயின்ஸ், அல்லது NSQF லெவல் 5 பட்டயப் படிப்புகளில் சேரலாம்.",
-    "cutoff": "தமிழ்நாட்டில் TNEA கட் ஆஃப் 200 மதிப்பெண்களுக்குக் கணக்கிடப்படுகிறது (கணிதம் 100 + இயற்பியல் 50 + வேதியியல் 50). CEG, MIT கல்லூரிகளுக்கு 190+ கட் ஆஃப் தேவை.\n\n*(குறிப்பு: கட் ஆஃப் மதிப்பெண்கள் தோராயமானவை, ஒவ்வொரு ஆண்டும் மாறும்).*",
-    "scholarship": "முக்கிய உதவித்தொகைகள்:\n\n• புதுமைப் பெண் திட்டம் (அரசுப் பள்ளி மாணவிகளுக்கு ₹1,000/மாதம்)\n• முதல் பட்டதாரி உதவித்தொகை (முழு கல்விக் கட்டண விலக்கு)\n• AICTE பிரகதி திட்டம் (மாணவிகளுக்கு ₹50,000/ஆண்டு)\n• ஆதிதிராவிடர் பிற்படுத்தப்பட்டோர் உதவித்தொகை.",
-    "job": "தற்போது அதிக வாய்ப்புள்ள துறைகள்:\n\n• செயற்கை நுண்ணறிவு (AI/ML)\n• ஃபுல்-ஸ்டாக் வெப் டெவலப்மென்ட்\n• சைபர் செக்யூரிட்டி\n• மின்சார வாகனத் தொழில் நுட்பம் (EV).",
-    "nsqf": "NSQF (தேசிய திறன் தகுதிகள் கட்டமைப்பு) நிலைகள் 1 முதல் 10 வரை தொழிற்கல்வி சான்றிதழ்களையும் வேலைவாய்ப்பு திறன்களையும் வழங்குகிறது."
+    "10th": (
+        "10-ஆம் வகுப்பிற்குப் பிறகு நீங்கள் தேர்வு செய்யக்கூடிய வாய்ப்புகள்:\n\n"
+        "• 11/12-ஆம் வகுப்பு (அறிவியல், கணிதம், வணிகவியல்)\n"
+        "• 3 ஆண்டு பாலிடெக்னிக் டிப்ளமோ (கம்ப்யூட்டர், சிவில், மெக்கானிக்கல்)\n"
+        "• NSQF தொழிற்கல்வி சான்றிதழ் படிப்புகள்."
+    ),
+    "12th": (
+        "12-ஆம் வகுப்பிற்குப் பிறகு:\n\n"
+        "• உயிரியல் மாணவர்கள்: நீட் தேர்வு மூலம் MBBS, BDS மற்றும் மருத்துவ துணைப் படிப்புகள்\n"
+        "• கணித மாணவர்கள்: TNEA மூலம் B.E/B.Tech பொறியியல் படிப்புகள்\n"
+        "• வணிகவியல் மாணவர்கள்: B.A. LL.B. சட்டம், B.Com, BBA, பட்டயக் கணக்காளர் (CA)\n"
+        "• கலை & அறிவியல்: B.Sc, B.A. மற்றும் ஆசிரியர் பட்டயப் படிப்பு (B.Ed)."
+    ),
+    "cutoff": (
+        "தமிழ்நாட்டில் கட் ஆஃப் விவரங்கள்:\n\n"
+        "• பொறியியல் (TNEA): 200 மதிப்பெண்களுக்கு கணக்கிடப்படுகிறது (கணிதம் 100 + இயற்பியல் 50 + வேதியியல் 50). CEG, PSG கல்லூரிகளுக்கு 190+ தேவை.\n"
+        "• மருத்துவம் (NEET): 720 மதிப்பெண்களுக்கு கணக்கிடப்படுகிறது. அரசு மருத்துவக் கல்லூரிகளுக்கு 630+ தேவை.\n\n"
+        "*(குறிப்பு: கட் ஆஃப் மதிப்பெண்கள் தோராயமானவை, ஆண்டுதோறும் மாறும்).*"
+    ),
+    "scholarship": (
+        "தமிழ்நாடு அரசு வழங்கும் முக்கிய உதவித்தொகைகள்:\n\n"
+        "• புதுமைப் பெண் திட்டம் (அரசுப் பள்ளி மாணவிகளுக்கு ₹1,000/மாதம்)\n"
+        "• தமிழ்ப் புதல்வன் திட்டம் (அரசுப் பள்ளி மாணவர்களுக்கு ₹1,000/மாதம்)\n"
+        "• முதல் பட்டதாரி உதவித்தொகை (முழு கல்விக் கட்டண விலக்கு)\n"
+        "• அரசுப் பள்ளி 7.5% இடஒதுக்கீடு மாணவர்களுக்கான முழு கல்விக் கட்டண உதவி\n"
+        "• ஆதிதிராவிடர் & பழங்குடியினர் போஸ்ட் மெட்ரிக் உதவித்தொகை\n"
+        "• பிற்படுத்தப்பட்டோர் (BC/MBC) நல உதவித்தொகை."
+    ),
+    "job": (
+        "தற்போது அதிக வாய்ப்புள்ள வேலைவாய்ப்பு துறைகள்:\n\n"
+        "• மருத்துவம் & சுகாதாரத்துறை\n"
+        "• செயற்கை நுண்ணறிவு (AI/ML) & டேட்டா சயின்ஸ்\n"
+        "• மென்பொருள் & கிளவுட் டெவலப்மென்ட்\n"
+        "• சிவில் & ஸ்மார்ட் சிட்டி கட்டமைப்பு\n"
+        "• மின்சார வாகனத் தொழில் நுட்பம் (EV)\n"
+        "• வணிக சட்டம் & கார்ப்பரேட் ஆலோசனைகள்."
+    ),
+    "nsqf": (
+        "NSQF (தேசிய திறன் தகுதிகள் கட்டமைப்பு) நிலைகள் 1 முதல் 10 வரை தொழிற்கல்வி மற்றும் தேசிய சான்றிதழ்களை வழங்குகிறது. இது தங்களுக்குத் தேவையான தொழில்துறை திறன்களை வளர்க்க உதவுகிறது."
+    )
 }
 
 @router.post("")
@@ -189,7 +231,7 @@ def chat_with_ai(req: ChatRequest):
             f"• Physics Marks: {p:.1f} / 100 (Physics ÷ 2 = {ph:.1f})\n"
             f"• Chemistry Marks: {c:.1f} / 100 (Chemistry ÷ 2 = {ch:.1f})\n\n"
             f"🎯 Your Calculated TNEA Cutoff Score: {co:.2f} / 200\n\n"
-            f"With a cutoff score of {co:.2f}, you can check your eligibility across 60+ colleges in Tamil Nadu.\n"
+            f"With a cutoff score of {co:.2f}, you can check your eligibility across colleges in Tamil Nadu.\n"
             f"Go to the 'Colleges & Cutoffs' page in the navigation menu to filter eligible institutions!\n\n"
             f"*(Note: TNEA cutoffs are approximate, change every year, and vary by community category).*"
         )
@@ -199,7 +241,7 @@ def chat_with_ai(req: ChatRequest):
             "suggested_actions": [
                 "Check Colleges & Cutoffs Page",
                 "View Scholarships",
-                "See AI Industry Trends"
+                "See Industry Trends"
             ]
         }
 
@@ -209,10 +251,10 @@ def chat_with_ai(req: ChatRequest):
         response_text = (
             f"🏛️ Community Cutoffs for BC (Backward Class) Students:\n\n"
             f"{score_text}"
-            f"• Colleges in Tamil Nadu publish separate TNEA cutoff benchmarks for each community category (OC, BC, BCM, MBC, SC, ST).\n"
+            f"• Colleges in Tamil Nadu publish separate cutoff benchmarks for each community category (OC, BC, BCM, MBC, SC, ST).\n"
             f"• The BC cutoff benchmark is usually lower than the OC (Open Competition) cutoff.\n"
             f"• On each college card in the 'Colleges & Cutoffs' page, compare your cutoff score directly with the 'BC' cutoff number shown (e.g., BC: 158 | OC: 168).\n\n"
-            f"*(Note: TNEA cutoffs are approximate, change every year based on applicant merit, and vary by community category).*"
+            f"*(Note: Cutoffs are approximate, change every year based on applicant merit, and vary by community category).*"
         )
         return {
             "reply": response_text,
@@ -240,10 +282,10 @@ def chat_with_ai(req: ChatRequest):
         else:
             response_text = (
                 "மன்னித்துக்கொள்ளுங்கள், உங்கள் கேள்வி தெளிவாக இல்லை.\n\n"
-                "நான் உதவக்கூடிய பகுதிகள்:\n"
-                "• TNEA கட் ஆஃப் கணக்கீடு\n"
-                "• உதவித்தொகை திட்டங்கள்\n"
-                "• NSQF திறன் நிலைகள்\n"
+                "நான் உதவக்கூடிய பகுதிகள்:\n\n"
+                "• TNEA & NEET கட் ஆஃப் கணக்கீடு\n"
+                "• தமிழ்நாடு அரசு உதவித்தொகை திட்டங்கள்\n"
+                "• NSQF தொழில் நுட்ப பயிற்சி நிலைகள்\n"
                 "• 10/12-ஆம் வகுப்பிற்குப் பிந்தைய படிப்புகள் & வேலைவாய்ப்புகள்!"
             )
         return {
@@ -267,18 +309,74 @@ def chat_with_ai(req: ChatRequest):
         "suitable for me" in msg_lower
     ):
         student_name = req.user_name or "Sahana Balaji"
-        edu = req.education or "Computer Science Student"
-        career = req.target_career or "AI & Full-Stack Engineering"
-        sk = req.skills or "Python, React, Web Development"
+        edu = req.education or "Student"
+        career = (req.target_career or "Software Developer").strip()
+        sk = req.skills or "Core Problem Solving"
+
+        detected_dom = detect_domain(career, [sk])
+
+        if detected_dom == "medicine":
+            steps_text = (
+                "1) Prepare rigorously for NEET-UG with 50%+ in 12th PCB (aim for 620+ for premier TN Government Medical Colleges like Madras Medical College or Stanley).\n"
+                "2) Complete the 4.5-Year M.B.B.S. degree program with extensive clinical hospital rotations.\n"
+                "3) Complete 1-Year Compulsory Rotatory Residential Internship (CRRI) and register with Tamil Nadu Medical Council."
+            )
+        elif detected_dom == "civil":
+            steps_text = (
+                "1) Target high TNEA cutoffs (190+) for premier colleges like CEG Anna University, PSG Tech, and TCE Madurai.\n"
+                "2) Master Building Information Modeling (BIM - Revit) and Structural Analysis (STAAD.Pro / ETABS).\n"
+                "3) Pursue on-site construction internships with top infrastructure employers like L&T, Shapoorji Pallonji, and PWD."
+            )
+        elif detected_dom == "law":
+            steps_text = (
+                "1) Prepare for CLAT or apply through 12th Board Merit for TNDALU (School of Excellence in Law).\n"
+                "2) Pursue a 5-Year Integrated B.A. LL.B. (Hons) or B.B.A. LL.B. degree.\n"
+                "3) Complete court chamber practice, moot court competitions, and clear the All India Bar Examination (AIBE)."
+            )
+        elif detected_dom == "teaching":
+            steps_text = (
+                "1) Complete Undergraduate subject graduation (B.A. / B.Sc) with 50%+ marks in your core subject.\n"
+                "2) Pursue a 2-Year Bachelor of Education (B.Ed) at NCTE-approved institutions like IASE Saidapet.\n"
+                "3) Complete 16 weeks of school teaching practice and qualify TNTET Paper 1/2 or TRB for government appointment."
+            )
+        elif detected_dom == "data_science":
+            steps_text = (
+                "1) Master Applied Mathematics, Linear Algebra, and Python (NumPy, Pandas, Scikit-learn).\n"
+                "2) Specialize in SQL Database analytics, Power BI dashboards, and Machine Learning algorithms.\n"
+                "3) Target enterprise data science roles at Tiger Analytics, LatentView, Mu Sigma, or Zoho."
+            )
+        elif detected_dom == "ev_automotive":
+            steps_text = (
+                "1) Master Power Electronics, embedded microcontrollers, and electrical safety fundamentals.\n"
+                "2) Complete NSQF Level 6 Electric Vehicle Technology & Battery Management Systems (BMS).\n"
+                "3) Gain hands-on powertrain calibration experience in Tamil Nadu's EV manufacturing corridor (Hosur/Chennai)."
+            )
+        elif detected_dom == "finance_accounting":
+            steps_text = (
+                "1) Master Tally Prime with GST e-Way bills, bank reconciliations, and voucher entries.\n"
+                "2) Advance to Corporate Tax compliance, TDS filing, and Advanced Excel financial modeling.\n"
+                "3) Target audit firms, Big 4 accounting practices (Deloitte/EY/PwC), or prepare for ICAI CA Foundation."
+            )
+        elif detected_dom == "software":
+            steps_text = (
+                "1) Master Data Structures & Algorithms, Python/Java, and Modern Web (React & FastAPI).\n"
+                "2) Build production-grade cloud microservices, SQL databases, and containerize with Docker.\n"
+                "3) Target software product engineering placements at Zoho, Freshworks, Microsoft, and TCS Digital."
+            )
+        else:
+            steps_text = (
+                f"1) Strengthen foundational domain literacy and entry requirements in {career}.\n"
+                f"2) Pursue a recognized Degree, Diploma, or NSQF certification aligned with {career}.\n"
+                f"3) Complete an industry apprenticeship and build a verified portfolio of hands-on work in {career}."
+            )
+
         response_text = (
-            f"Hi {student_name}! Based on your logged-in profile:\n\n"
+            f"Hi {student_name}! Based on your profile:\n\n"
             f"• Current Status: {edu}\n"
             f"• Target Goal: {career}\n"
             f"• Key Skills: {sk}\n\n"
             f"🎯 Recommended Personalized Pathway:\n"
-            f"1) Start with NSQF Level 5 Full-Stack Certification (FastAPI & React)\n"
-            f"2) Progress to NSQF Level 6 Advanced AI & Machine Learning Specialist\n"
-            f"3) Target top hiring companies like Zoho, Freshworks, and TCS Digital.\n\n"
+            f"{steps_text}\n\n"
             f"Explore the 'AI Skilling Navigator' tab for your full interactive roadmap!"
         )
         return {
@@ -286,7 +384,7 @@ def chat_with_ai(req: ChatRequest):
             "suggested_actions": [
                 "View AI Skilling Navigator",
                 "Explore Upskilling Hub",
-                "Check TNEA Cutoffs"
+                "Check Colleges & Cutoffs"
             ]
         }
 
@@ -295,7 +393,7 @@ def chat_with_ai(req: ChatRequest):
         greeting_name = f", {req.user_name}" if req.user_name else ""
         response_text = (
             f"Hello{greeting_name}! I am Ascentia AI, your Career & Education Navigator.\n\n"
-            f"Ask me about TNEA cutoffs, career options after 10th/12th, NSQF skill levels, or scholarships!"
+            f"Ask me about cutoffs, career options after 10th/12th, NSQF skill levels, or scholarships!"
         )
     elif contains_whole_word(msg_lower, "cutoff") or contains_whole_word(msg_lower, "cutoffs") or contains_whole_word(msg_lower, "tnea") or contains_whole_word(msg_lower, "mark") or contains_whole_word(msg_lower, "marks"):
         response_text = KNOWLEDGE_BASE["cutoff"]
@@ -318,9 +416,9 @@ def chat_with_ai(req: ChatRequest):
         # Honest Fallback Message
         response_text = (
             "I'm not sure about that specific query yet. I can help you with:\n\n"
-            "• 🧮 TNEA Cutoff Calculations (e.g., '99 in Maths, 69 in Physics, 81 in Chemistry')\n"
-            "• 🎓 Career Options after 10th & 12th\n"
-            "• 💰 Scholarships & Grants\n"
+            "• 🧮 TNEA & NEET Cutoff Calculations (e.g., '99 in Maths, 69 in Physics, 81 in Chemistry')\n"
+            "• 🎓 Career Options after 10th & 12th (Medicine, Engineering, Law, Teaching, Commerce)\n"
+            "• 💰 Tamil Nadu Scholarships & Grants\n"
             "• 📜 NSQF Skill Levels 1–10\n"
             "• 📈 Job & Hiring Salary Trends\n\n"
             "Feel free to ask about any of these!"

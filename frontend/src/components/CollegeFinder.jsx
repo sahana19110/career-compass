@@ -41,7 +41,7 @@ const getCollegeInitials = (name) => {
   return words.map(w => w[0]).join('').substring(0, 4).toUpperCase();
 };
 
-const CollegeFinder = () => {
+const CollegeFinder = ({ activeCareer }) => {
   const [colleges, setColleges] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('All Districts (38 Districts)');
@@ -50,6 +50,17 @@ const CollegeFinder = () => {
   const [onlyNirf, setOnlyNirf] = useState(false);
   const [sortBy, setSortBy] = useState('cutoff'); // 'cutoff', 'rating', 'fees'
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeCareer) {
+      const cLower = activeCareer.toLowerCase();
+      if (cLower.includes('doctor') || cLower.includes('medic')) setSelectedStream('Medical');
+      else if (cLower.includes('law') || cLower.includes('advocat')) setSelectedStream('Law');
+      else if (cLower.includes('teach') || cLower.includes('educat')) setSelectedStream('Education');
+      else if (cLower.includes('account') || cLower.includes('commerce')) setSelectedStream('Commerce/Arts');
+      else if (cLower.includes('software') || cLower.includes('civil') || cLower.includes('engineer') || cLower.includes('data')) setSelectedStream('Engineering');
+    }
+  }, [activeCareer]);
 
   const [isWakingUp, setIsWakingUp] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -104,11 +115,14 @@ const CollegeFinder = () => {
 
   // Combined Filter & Sort Pipeline
   let processedColleges = colleges.filter((col) => {
-    // Cutoff Eligibility Filter
+    // Cutoff Eligibility Filter (Only applies to Engineering colleges)
     if (filterByCutoff) {
-      const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
-      if (typeof benchmark === 'number' && parseFloat(computedCutoff) < benchmark) {
-        return false;
+      const isEng = col.stream_type === 'Engineering';
+      if (isEng) {
+        const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
+        if (typeof benchmark === 'number' && parseFloat(computedCutoff) < benchmark) {
+          return false;
+        }
       }
     }
     // NIRF Top Ranked Filter
@@ -282,6 +296,9 @@ const CollegeFinder = () => {
             >
               <option value="All">All Streams</option>
               <option value="Engineering">Engineering (B.E / B.Tech)</option>
+              <option value="Medical">Medical & Healthcare (M.B.B.S., Allied)</option>
+              <option value="Law">Law (B.A. LL.B., LL.M.)</option>
+              <option value="Education">Education & Teaching (B.Ed)</option>
               <option value="Commerce/Arts">Commerce & Arts (B.Com, BBA)</option>
               <option value="Polytechnic">Polytechnic Diploma</option>
             </select>
@@ -366,9 +383,12 @@ const CollegeFinder = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {processedColleges.map((col, idx) => {
+            const isMedical = col.stream_type === 'Medical' || col.name.toLowerCase().includes('medical');
+            const isLaw = col.stream_type === 'Law' || col.name.toLowerCase().includes('law');
+            const isEducation = col.stream_type === 'Education' || col.courses_offered.some(c => c.toLowerCase().includes('b.ed'));
             const isPolytechnic = col.stream_type === 'Polytechnic' || col.type === 'Polytechnic' || col.name.toLowerCase().includes('polytechnic');
-            const isArtsScience = col.stream_type === 'Commerce/Arts' || col.name.toLowerCase().includes('arts') || col.name.toLowerCase().includes('loyola') || col.name.toLowerCase().includes('mcc');
-            const isEngineering = !isPolytechnic && !isArtsScience;
+            const isArtsScience = col.stream_type === 'Commerce/Arts' || col.name.toLowerCase().includes('arts') || col.name.toLowerCase().includes('loyola') || col.name.toLowerCase().includes('mcc') || col.name.toLowerCase().includes('presidency');
+            const isEngineering = !isMedical && !isLaw && !isEducation && !isPolytechnic && !isArtsScience;
 
             const benchmark = col.cutoff_marks[selectedCommunity] || col.cutoff_marks.BC || col.cutoff_marks.OC || 160;
             const userScore = parseFloat(computedCutoff);
@@ -421,7 +441,22 @@ const CollegeFinder = () => {
 
                   {/* Admission Eligibility Badge */}
                   <div className="absolute bottom-3 left-3">
-                    {isPolytechnic ? (
+                    {isMedical ? (
+                      <span className="text-[10px] px-3 py-1 bg-rose-950/90 text-rose-300 border border-rose-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-rose-400" />
+                        <span>NEET-UG Medical Admission (Eligibility: 50%+ in PCB)</span>
+                      </span>
+                    ) : isLaw ? (
+                      <span className="text-[10px] px-3 py-1 bg-amber-950/90 text-amber-300 border border-amber-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+                        <span>BCI / TNDALU State Law Merit Admission</span>
+                      </span>
+                    ) : isEducation ? (
+                      <span className="text-[10px] px-3 py-1 bg-blue-950/90 text-blue-300 border border-blue-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                        <span>NCTE Approved B.Ed Teacher Admission</span>
+                      </span>
+                    ) : isPolytechnic ? (
                       <span className="text-[10px] px-3 py-1 bg-indigo-950/90 text-indigo-300 border border-indigo-700/80 rounded-full font-extrabold flex items-center space-x-1 backdrop-blur-md">
                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
                         <span>SSLC 10th / 12th Merit Diploma Admission</span>
@@ -504,10 +539,49 @@ const CollegeFinder = () => {
 
                   <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Cutoff Benchmark ({selectedCommunity}):</span>
-                      <span className="text-xs font-bold text-amber-400">
-                        {selectedCommunity}: {benchmark} | OC: {col.cutoff_marks.OC}
-                      </span>
+                      {isMedical ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">NEET-UG Cutoff Score:</span>
+                          <span className="text-xs font-bold text-rose-400">
+                            BC: {col.cutoff_marks.NEET_BC || 635} | OC: {col.cutoff_marks.NEET_OC || 655} / 720
+                          </span>
+                        </>
+                      ) : isLaw ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">12th HSC / CLAT Merit:</span>
+                          <span className="text-xs font-bold text-amber-400">
+                            BC: {col.cutoff_marks.BC || 85}% | OC: {col.cutoff_marks.OC || 90}%
+                          </span>
+                        </>
+                      ) : isEducation ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">B.Ed Teacher Degree Merit:</span>
+                          <span className="text-xs font-bold text-blue-400">
+                            BC: {col.cutoff_marks.BC || 82}% | OC: {col.cutoff_marks.OC || 86}%
+                          </span>
+                        </>
+                      ) : isPolytechnic ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">SSLC 10th Marks Cutoff:</span>
+                          <span className="text-xs font-bold text-indigo-400">
+                            BC: {col.cutoff_marks.BC || 80}% | OC: {col.cutoff_marks.OC || 85}%
+                          </span>
+                        </>
+                      ) : isArtsScience ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">12th HSC Board Cutoff:</span>
+                          <span className="text-xs font-bold text-purple-400">
+                            BC: {col.cutoff_marks.BC || 90}% | OC: {col.cutoff_marks.OC || 95}%
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">TNEA Cutoff Benchmark ({selectedCommunity}):</span>
+                          <span className="text-xs font-bold text-amber-400">
+                            {selectedCommunity}: {benchmark} | OC: {col.cutoff_marks.OC || benchmark} / 200
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     <a

@@ -309,14 +309,145 @@ const TARGET_CAREERS = [
         explanation: 'MPPT ensures solar arrays extract maximum power under varying sunlight and temperature conditions.'
       }
     ]
+  },
+  {
+    id: 'doctor_medicine',
+    title: 'Medical Doctor & Clinical Practitioner (MBBS)',
+    category: 'Healthcare & Medicine',
+    demand: 'Extreme (+24% YoY, Critical Shortage)',
+    salary: '₹8.0L - ₹28L / yr',
+    nsqf_level: 'Level 8-9',
+    requiredSkills: ['Clinical Diagnostics & Bedside Care', 'Human Anatomy & Physiology', 'Pharmacology & Prescription', 'Emergency Trauma & Triage', 'Medical Ethics & Patient Communication', 'Pathology & Lab Diagnostics'],
+    initialUserSkills: ['Human Anatomy & Physiology', 'Medical Ethics & Patient Communication'],
+    courses: [
+      { name: 'NMC / DME: MBBS Clinical Medicine & Rotations', provider: 'Madras Medical College / DME TN', link: 'https://mmc.ac.in', duration: '5.5 Years' },
+      { name: 'NPTEL: Essentials of Medical Physiology & Biochemistry', provider: 'IIT Madras', link: 'https://nptel.ac.in', duration: '12 Weeks' },
+      { name: 'SWAYAM: Clinical Research & Medical Ethics', provider: 'AIIMS / NPTEL', link: 'https://swayam.gov.in', duration: '8 Weeks' }
+    ],
+    quiz: [
+      {
+        question: 'Under Indian medical regulatory standards, what mandatory qualification exam determines eligibility for MBBS admission?',
+        options: [
+          'NEET-UG (National Eligibility cum Entrance Test)',
+          'JEE Advanced Examination',
+          'Graduate Aptitude Test (GATE)',
+          'Common Law Admission Test (CLAT)'
+        ],
+        correct: 0,
+        explanation: 'NEET-UG is the single national entrance examination for admission into undergraduate medical programs across India.'
+      },
+      {
+        question: 'What is the required duration of the Compulsory Rotatory Residential Internship (CRRI) during MBBS in India?',
+        options: [
+          '12 Months (1 Full Year) across rotating hospital departments',
+          '3 Months in outpatient care',
+          '6 Weeks observational study',
+          '24 Months continuous ICU duty'
+        ],
+        correct: 0,
+        explanation: 'CRRI requires 12 months of hands-on rotating clinical postings across surgery, medicine, OBG, pediatrics, and community health.'
+      }
+    ]
+  },
+  {
+    id: 'lawyer_advocate',
+    title: 'Legal Advocate & Corporate Counsel',
+    category: 'Law, Judiciary & Governance',
+    demand: 'High (+20% YoY)',
+    salary: '₹6.0L - ₹20L / yr',
+    nsqf_level: 'Level 7-8',
+    requiredSkills: ['Constitutional Law of India', 'Criminal & Civil Law (BNS/CrPC)', 'Legal Drafting & Conveyancing', 'Moot Court Advocacy & Cross-Examination', 'Corporate Compliance & Contracts', 'Arbitration & Dispute Resolution'],
+    initialUserSkills: ['Constitutional Law of India', 'Legal Drafting & Conveyancing'],
+    courses: [
+      { name: 'TNDALU: 5-Year Integrated B.A. LL.B. (Hons)', provider: 'School of Excellence in Law (SOEL) Chennai', link: 'https://tndalu.ac.in', duration: '5 Years' },
+      { name: 'SWAYAM: Constitutional Law & Human Rights', provider: 'NLSIU Bangalore / UGC', link: 'https://swayam.gov.in', duration: '12 Weeks' }
+    ],
+    quiz: [
+      {
+        question: 'Which exam is mandatory for law graduates to obtain a permanent Certificate of Practice (COP) from the Bar Council of India?',
+        options: [
+          'All India Bar Examination (AIBE)',
+          'UGC National Eligibility Test (NET)',
+          'Civil Services Preliminary Exam',
+          'Common Entrance Test (CET)'
+        ],
+        correct: 0,
+        explanation: 'The All India Bar Examination (AIBE) is conducted by the Bar Council of India to assess minimum capability to practice law.'
+      }
+    ]
+  },
+  {
+    id: 'school_educator',
+    title: 'Professional School Educator & Teacher',
+    category: 'Education, Pedagogy & EdTech',
+    demand: 'Steady High (+18% YoY)',
+    salary: '₹4.5L - ₹12L / yr',
+    nsqf_level: 'Level 6-7',
+    requiredSkills: ['Child Psychology & Learning Theories', 'Curriculum Design & Lesson Planning', 'Smart Classroom EdTech Tools', 'Classroom Behavior Management', 'Formative & Summative Assessment', 'Inclusive Special Education'],
+    initialUserSkills: ['Child Psychology & Learning Theories', 'Curriculum Design & Lesson Planning'],
+    courses: [
+      { name: 'TNTEU / NCTE: Bachelor of Education (B.Ed)', provider: 'IASE Saidapet / Lady Willingdon Chennai', link: 'https://tnteu.ac.in', duration: '2 Years' },
+      { name: 'SWAYAM: Pedagogy & Educational Technology in Practice', provider: 'NCERT / CIET', link: 'https://swayam.gov.in', duration: '12 Weeks' }
+    ],
+    quiz: [
+      {
+        question: 'Which eligibility examination is compulsory for appointment as a teacher in Tamil Nadu Government and Aided Schools?',
+        options: [
+          'Tamil Nadu Teacher Eligibility Test (TNTET / TRB)',
+          'TNEA Counseling Merit Rank',
+          'GATE Examination Scorecard',
+          'CAT Management Score'
+        ],
+        correct: 0,
+        explanation: 'TNTET and TRB exams are mandated by the Tamil Nadu Teachers Recruitment Board for government teaching positions.'
+      }
+    ]
   }
 ];
 
-const UpskillingHub = () => {
-  const [selectedCareer, setSelectedCareer] = useState(TARGET_CAREERS[0]);
-  const [userSkills, setUserSkills] = useState(TARGET_CAREERS[0].initialUserSkills);
+const findMatchingCareer = (careerStr) => {
+  if (!careerStr) return TARGET_CAREERS[0];
+  const cLower = careerStr.toLowerCase();
+  if (cLower.includes('doctor') || cLower.includes('medic') || cLower.includes('mbbs') || cLower.includes('health')) {
+    return TARGET_CAREERS.find(c => c.id === 'doctor_medicine') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('civil') || cLower.includes('struct') || cLower.includes('construct') || cLower.includes('bim')) {
+    return TARGET_CAREERS.find(c => c.id === 'civil_smartcity') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('law') || cLower.includes('advocat') || cLower.includes('legal') || cLower.includes('court')) {
+    return TARGET_CAREERS.find(c => c.id === 'lawyer_advocate') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('teach') || cLower.includes('educat') || cLower.includes('pedagog') || cLower.includes('school')) {
+    return TARGET_CAREERS.find(c => c.id === 'school_educator') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('data') || cLower.includes('analyst') || cLower.includes('analytics')) {
+    return TARGET_CAREERS.find(c => c.id === 'data_science') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('ev') || cLower.includes('battery') || cLower.includes('electric vehicle') || cLower.includes('auto')) {
+    return TARGET_CAREERS.find(c => c.id === 'ev_tech') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('account') || cLower.includes('tally') || cLower.includes('finance') || cLower.includes('tax') || cLower.includes('ca')) {
+    return TARGET_CAREERS.find(c => c.id === 'fintech_analyst') || TARGET_CAREERS[0];
+  }
+  if (cLower.includes('cyber') || cLower.includes('security') || cLower.includes('hack')) {
+    return TARGET_CAREERS.find(c => c.id === 'cybersecurity') || TARGET_CAREERS[0];
+  }
+  return TARGET_CAREERS[0];
+};
+
+const UpskillingHub = ({ activeCareer }) => {
+  const [selectedCareer, setSelectedCareer] = useState(() => findMatchingCareer(activeCareer));
+  const [userSkills, setUserSkills] = useState(() => findMatchingCareer(activeCareer).initialUserSkills);
   const [earnedBadges, setEarnedBadges] = useState(['Python Fundamentals', 'React UI Essentials']);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
+
+  React.useEffect(() => {
+    if (activeCareer) {
+      const matched = findMatchingCareer(activeCareer);
+      setSelectedCareer(matched);
+      setUserSkills(matched.initialUserSkills);
+    }
+  }, [activeCareer]);
   
   // Full-Screen Quiz Modal State
   const [showQuizModal, setShowQuizModal] = useState(false);

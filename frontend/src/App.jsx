@@ -16,8 +16,26 @@ function App() {
   const [activeTab, setActiveTab] = useState('navigator');
   const [currentLang, setCurrentLang] = useState('en');
   const [recommendation, setRecommendation] = useState(null);
+  const [learnerProfile, setLearnerProfile] = useState({
+    education: '12th_PCM',
+    target_career: 'Software Developer',
+    skills: ['Python Basics', 'Mathematics']
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const handleAssessmentComplete = (data, profile) => {
+    setRecommendation(data);
+    if (profile) {
+      setLearnerProfile(profile);
+    } else if (data?.learner_summary) {
+      setLearnerProfile({
+        education: data.learner_summary.education,
+        target_career: data.learner_summary.target_career,
+        skills: data.stackable_skills || []
+      });
+    }
+  };
 
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
 
@@ -95,7 +113,7 @@ function App() {
               <span className="text-slate-200">
                 {recommendation
                   ? `🎯 Target: ${recommendation.learner_summary.target_career}`
-                  : `🎓 Profile: ${user.role || 'Computer Science Student'}`}
+                  : `🎯 Target: ${learnerProfile.target_career}`}
               </span>
             </div>
           </div>
@@ -105,7 +123,7 @@ function App() {
         {activeTab === 'navigator' && (
           <div className="space-y-8">
             <LearnerAssessment
-              onAssessmentComplete={(data) => setRecommendation(data)}
+              onAssessmentComplete={handleAssessmentComplete}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
             />
@@ -114,15 +132,15 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'upskill' && <UpskillingHub />}
+        {activeTab === 'upskill' && <UpskillingHub activeCareer={learnerProfile.target_career} />}
 
-        {activeTab === 'colleges' && <CollegeFinder />}
+        {activeTab === 'colleges' && <CollegeFinder activeCareer={learnerProfile.target_career} />}
 
-        {activeTab === 'trends' && <MarketTrends />}
+        {activeTab === 'trends' && <MarketTrends activeCareer={learnerProfile.target_career} />}
 
         {activeTab === 'scholarships' && <ScholarshipFinder />}
 
-        {activeTab === 'chatbot' && <AIChatbot user={user} />}
+        {activeTab === 'chatbot' && <AIChatbot user={user} learnerProfile={learnerProfile} />}
 
       </main>
 

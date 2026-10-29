@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bot, Send, User, Sparkles, Globe, Mic, Volume2 } from 'lucide-react';
 import axios from 'axios';
 
-const AIChatbot = ({ user }) => {
+const AIChatbot = ({ user, learnerProfile }) => {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
@@ -44,9 +44,9 @@ const AIChatbot = ({ user }) => {
         message: query,
         language: language,
         user_name: user?.name || 'Sahana Balaji',
-        education: user?.role || 'Computer Science Student',
-        target_career: 'AI & Full-Stack Engineering',
-        skills: 'Python, React, Web Development',
+        education: learnerProfile?.education || user?.role || 'Student',
+        target_career: learnerProfile?.target_career || 'Software Developer',
+        skills: Array.isArray(learnerProfile?.skills) ? learnerProfile.skills.join(', ') : (learnerProfile?.skills || 'Analytical Thinking'),
         history: historyPayload
       });
 
