@@ -1,80 +1,170 @@
-# 🚀 ASCENTIA AI — Smart Skilling & TNEA Admission Platform
+# 🚀 ASCENTIA AI — Smart Skilling Navigator
 
-> **“From Aspiration to Achievement: Your Smart Skilling Navigator”**
+> **"From Aspiration to Achievement: Your Smart Skilling Navigator"**
 
-ASCENTIA AI is an intelligent full-stack career navigation and admission allocation platform designed to empower students across Tamil Nadu and nationwide. It dynamically maps academic qualifications to **NSQF Levels 1–10**, calculates **TNEA engineering cutoffs**, indexes **60+ top colleges across all 38 Tamil Nadu districts**, and bridges skill gaps through interactive technical micro-credentials.
+ASCENTIA AI is an intelligent full-stack career navigation and education guidance platform built for students in Tamil Nadu and across India. It provides personalized career roadmaps, college discovery, scholarship matching, AI-powered counseling, and NSQF-aligned skill pathways — supporting **18+ career domains** from Medicine to Aviation to Robotics.
 
 ---
 
-## 🌐 Live Website & Demo
+## 🌐 Live Demo
 
-- 🎨 **Live Web Application**: [https://career-compass-rho-tawny.vercel.app](https://career-compass-rho-tawny.vercel.app)
-- ⚙️ **Backend API Status**: [https://career-compass-1mil.onrender.com](https://career-compass-1mil.onrender.com)
+- 🎨 **Live Application**: [https://career-compass-rho-tawny.vercel.app](https://career-compass-rho-tawny.vercel.app)
+- ⚙️ **Backend API**: [https://career-compass-1mil.onrender.com](https://career-compass-1mil.onrender.com)
 - 📖 **API Documentation**: [https://career-compass-1mil.onrender.com/docs](https://career-compass-1mil.onrender.com/docs)
 
 ---
 
 ## 🌟 Key Features
 
-* **🤖 AI Skilling Recommendation Engine**: Scikit-Learn TF-IDF cosine similarity vectorizer mapping learner profiles (10th, 12th PCM/PCB/Commerce, Diploma, UG) to aligned NSQF qualification standards and stackable micro-credentials.
-* **🎓 Tamil Nadu College Explorer**: Directory of 60+ top colleges across **all 38 Tamil Nadu districts** filtered by streams, community quotas (`OC, BC, BCM, MBC, SC, ST`), and autonomous/government status.
-* **🧮 TNEA Engineering Cutoff Predictor**: Calculates engineering cutoff score out of 200 (`Maths + Phys/2 + Chem/2`) and predicts admission eligibility based on historical allocation benchmarks.
-* **⚡ Interactive Upskilling Hub & Micro-Quiz Center**: 10+ target industry career paths (*Full-Stack AI*, *EV Powertrain*, *BFSI Fintech*, *Cybersecurity*, *Robotics*, etc.) with interactive technical micro-quizzes, skill gap checklist, and verified badge certificates.
-* **📄 Printable Skilling Passport PDF Exporter**: Official printable credential summary for student resumes and job applications.
-* **💰 Scholarships & Grants Directory**: Directory of 15+ Central, TN State (Pudhumai Penn, 7.5% Govt School Waiver), and Corporate scholarship schemes.
-* **🌐 Multilingual Localization**: Built-in 5-language switcher (**English, தமிழ், हिंदी, తెలుగు, മലയാളം**).
-* **💬 Ascentia AI Counselor**: Multilingual virtual career assistant.
+### 🤖 AI-Powered Career Counselor
+- Intelligent chatbot powered by **Groq AI (Llama 3.3 70B)** that responds to ANY user message
+- Handles casual conversation, career questions, education queries in **English, Tamil & Hindi**
+- Smart conversational handlers: greetings, identity, gratitude, farewell, help requests
+- Context-aware responses using student profile (name, education, target career)
+- Multi-turn conversation support with chat history
+
+### 🎯 Universal Career Recommendation Engine
+- Supports **18+ career pathways**: Medicine, Engineering, Law, Teaching, Data Science, Aviation, Fashion Design, Pharmacy, Agriculture, Robotics, Psychology, Finance, EV/Automotive & more
+- Scikit-Learn TF-IDF cosine similarity vectorizer mapping learner profiles to NSQF qualification standards
+- Domain-specific roadmaps with step-by-step progression from education to career
+- Accepts ANY custom career input — not limited to presets
+
+### 🎓 Tamil Nadu College Explorer
+- Directory of **60+ colleges** across all 38 Tamil Nadu districts
+- Streams: Engineering, Medical, Agriculture, Design, Pharmacy, Aviation & more
+- Filters by stream, district, community quota (OC/BC/BCM/MBC/SC/ST)
+- College cards with Wikipedia images, admission badges, and official links
+- Specialized colleges: TNAU, NIFT Chennai, MMC Pharmacy, Madras Flying Club
+
+### 🧮 TNEA & NEET Cutoff Calculator
+- TNEA engineering cutoff: `Maths + Physics/2 + Chemistry/2` (out of 200)
+- Community-wise cutoff benchmarks (OC, BC, MBC, SC/ST)
+- BC community cutoff explanation with historical data
+- NEET-UG score guidance for medical admissions
+
+### 📊 Career Discovery Assessment
+- Interactive assessment with 12 questions exploring interests, aptitudes & preferences
+- **6 career category tabs**: Technology, Healthcare, Creative, Business, Science, Service
+- Personalized career suggestions based on assessment results
+- "Type any career" universal input banner
+
+### ⚡ Upskilling Hub & Skill Gap Analyzer
+- 10+ target industry paths with technical micro-quizzes
+- Skill gap analysis comparing current skills vs. career requirements
+- Interactive quiz center with explanations and next steps
+- Career matching for Robotics, UI/UX Design, Renewable Energy, Biotech & more
+
+### 💰 Scholarships & Grants Directory
+- 15+ scholarship schemes: Pudhumai Penn, First Graduate, 7.5% Govt School Quota
+- Central & TN State government schemes with eligibility details
+- BC/MBC/SC/ST specific schemes
+- National Scholarship Portal (NSP) integration guidance
+
+### 📈 Labor Market Intelligence
+- Job & salary trends across AI, Medical, Civil, Law sectors
+- Industry-wise hiring demand data
+- Career progression routes and typical job roles
+
+### 📄 Skilling Passport
+- NSQF Levels 1–10 aligned qualification pathways
+- Printable PDF credential summary for resumes
+- Stackable micro-credentials tracking
+
+### 🌐 Multilingual Support
+- Built-in language switcher: **English, தமிழ் (Tamil), हिंदी (Hindi)**
+- AI chatbot responds in the user's preferred language
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Backend**: Python 3.10+, FastAPI, Uvicorn, Scikit-Learn (TF-IDF & Cosine Similarity), SQLite, Pydantic, Pandas, NumPy.
-* **Frontend**: React.js 18, Vite, Tailwind CSS, Lucide Icons, Recharts Analytics, Glassmorphism UI.
-* **Deployment**: Vercel (Frontend), Render (FastAPI Backend).
+| Layer | Technologies |
+|-------|-------------|
+| **Frontend** | React.js 18, Vite, Tailwind CSS, Lucide Icons, Recharts |
+| **Backend** | Python 3.10+, FastAPI, Uvicorn, Pydantic |
+| **AI/ML** | Groq AI (Llama 3.3 70B), Scikit-Learn (TF-IDF & Cosine Similarity) |
+| **Database** | SQLite, Pandas, NumPy |
+| **Deployment** | Vercel (Frontend), Render (Backend) |
+| **UI Design** | Glassmorphism, Dark Theme (Slate-950), Cyan/Indigo Accents |
 
 ---
 
-## 💻 Local Setup Instructions
+## 💻 Local Setup
 
 ### Prerequisites
-- Python 3.10 or higher
-- Node.js (v18+) & npm
+- Python 3.10+
+- Node.js v18+ & npm
+- Groq API Key (free from [console.groq.com](https://console.groq.com))
 
-### 1. One-Click Launcher (Windows)
-```powershell
-cd "D:\projects\career compass"
-.\start.bat
-```
-
-### 2. Manual Terminal Setup
-
-#### Backend:
+### Backend Setup
 ```bash
 cd backend
 pip install -r requirements.txt
 python main.py
 ```
-*Backend runs live at `http://127.0.0.1:8000`*
+Backend runs at `http://127.0.0.1:8000`
 
-#### Frontend:
+### Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*Frontend runs live at `http://localhost:5173`*
+Frontend runs at `http://localhost:5173`
+
+### Environment Variables
+Create a `.env` file or set these environment variables:
+```
+GROQ_API_KEY=your_groq_api_key_here
+```
 
 ---
 
-## 🌐 Live Demo & Deployment
-- 🎨 **Live Web Application (Vercel)**: [https://career-compass-rho-tawny.vercel.app](https://career-compass-rho-tawny.vercel.app)
-- ⚙️ **Live Backend API (Render)**: [https://career-compass-1mil.onrender.com](https://career-compass-1mil.onrender.com)
-- 📖 **Interactive Swagger Docs**: [https://career-compass-1mil.onrender.com/docs](https://career-compass-1mil.onrender.com/docs)
+## 📁 Project Structure
+
+```
+career-compass/
+├── backend/
+│   ├── main.py                 # FastAPI application entry point
+│   ├── ai_engine.py            # Career domain detection & recommendation engine
+│   ├── database.py             # SQLite database with colleges, courses & schemes
+│   ├── requirements.txt        # Python dependencies
+│   └── routes/
+│       ├── chatbot.py          # AI chatbot with Groq integration
+│       ├── colleges.py         # College finder API
+│       ├── recommendations.py  # Career recommendation API
+│       └── market_trends.py    # Labor market data API
+├── frontend/
+│   ├── src/
+│   │   └── components/
+│   │       ├── LearnerAssessment.jsx  # Career discovery & assessment
+│   │       ├── CollegeFinder.jsx      # College search & filters
+│   │       ├── UpskillingHub.jsx      # Skill gap analyzer & quizzes
+│   │       └── ...
+│   ├── vercel.json             # Vercel deployment config
+│   └── package.json
+└── README.md
+```
+
+---
+
+## 🚀 Deployment
+
+- **Frontend**: Auto-deploys to Vercel on `git push origin main`
+- **Backend**: Auto-deploys to Render on `git push origin main`
+- **CI/CD**: GitHub → Vercel + Render (automatic)
 
 ---
 
 ## 👤 Author
-**Sahana Balaji**  
-*Full-Stack & AI Developer*  
+
+**Sahana Balaji**
+*Full-Stack & AI Developer*
+
 - **GitHub**: [sahana19110](https://github.com/sahana19110)
+
+---
+
+## 📄 License
+
+This project is built for educational purposes as a career guidance tool for students.
