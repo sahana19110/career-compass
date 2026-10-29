@@ -80,9 +80,8 @@ ASCENTIA AI is an intelligent full-stack career navigation and education guidanc
 
 | Layer | Technologies |
 |-------|-------------|
-| **Frontend** | React.js 18, Vite, Tailwind CSS, Lucide Icons, Recharts |
-| **Backend** | Python 3.10+, FastAPI, Uvicorn, Pydantic |
-| **AI/ML** | Groq AI (Llama 3.3 70B), Scikit-Learn (TF-IDF & Cosine Similarity) |
+| **Frontend** | React.js 18, Vite, Tailwind CSS |
+| **Backend** | Python , FastAPI, Uvicorn, Pydantic |
 | **Database** | SQLite, Pandas, NumPy |
 | **Deployment** | Vercel (Frontend), Render (Backend) |
 | **UI Design** | Glassmorphism, Dark Theme (Slate-950), Cyan/Indigo Accents |
